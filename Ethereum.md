@@ -815,7 +815,7 @@ function withDrawMoney(address _address) external payable {
 
 
 
-### ABI(Application Binary Interface) ARRAY.
+#### ABI(Application Binary Interface) ARRAY.
 
 - It is used to interact with smart contracts.
 - **ABI ARRAY** provides web3js, what functions are present in smart contract.
@@ -842,7 +842,7 @@ let abiArray = [
 ```
 
 
-### INTERACTION WITH SMART CONTRACT (web3.eth)
+#### INTERACTION WITH SMART CONTRACT (web3.eth)
 
 - We can use **Web3** libraries to interact with our smart contract.
 - **web3.eth** provide us different methods/functions to interact with smart contract
@@ -986,7 +986,7 @@ contract setData {
 
 ```
 
-###
+### TOPICS COVERED IN ERC - 721, 1155, 721A (Ethereum Request for Comment)
 
 1. public mint function
 2. mint multiple nfts
@@ -999,10 +999,10 @@ contract setData {
 
 
 
+
 ### INSTALLING TRUFFLE AND INITIALLIZING THE PROJECT
 
 - npm install -g truffle (globally)
-
 - mkdir project_name
 - truffle init
 - npm init -y
