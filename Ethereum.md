@@ -996,8 +996,8 @@ contract setData {
 6. allowlist minting function
 7. minting window to enable and disable
 8. MAX LIMIT PER WALLET
-
-
+9. Refund functionality and Refund time period
+10. Testing smart contract on Testnet
 
 
 ### INSTALLING TRUFFLE AND INITIALLIZING THE PROJECT
@@ -1008,4 +1008,41 @@ contract setData {
 - npm init -y
 - echo "node_modules" > .gitignore
 - npm i --save @openzeppelin/contracts
+- npm i --global ganache
 - truffle compile 
+- ganache  (initialize ganache)
+
+<!-- unit testing of sc -->
+- truffle migrate --network ganache (deploy our sc using ganache)
+- truffle console --network ganache (opens the js provided ganache-truffle console)
+- migrate (inside the ganache console)
+- test (inside the ganache console)
+
+<!-- deploy sc on infura/Hd wallet provider -->
+- npm i @truffle/hdwallet-provider (to deploy our sc on blockchain network) using **HD wallet provider such as infura**
+- truffle migrate --network sepolia
+- truffle console --network sepolia (to deploy our sc on public network)
+
+
+<!-- deploy using metamask and truffle dashboard -->
+- truffle dashboard
+- truffle migrate --network dashboard
+
+<!-- verify -->
+- npm install -D truffle-plugin-verify
+- truffle run verify Web3 --network sepolia (for infura and hd wallet provider)  
+- truffle run verify Web3 --network dashboard (for truffle dashboard)   
+
+<!-- optimizer -->
+- reduces the gas needed for contract deployment as well as for external calls made to the contract.
+
+<!-- debugging (using console)-->
+- npm install @ganache/console.log
+- import "@ganache/console.log/console.sol";
+
+
+<!-- debugging (using truffle debugger)-->
+- ganache --fork.network sepolia
+- truffle debug <TXHASH> --network ganache --fetch-external
+- Hit return a few times to see the actual execution of the code.
+- Hit h for help and v for the current variables:
