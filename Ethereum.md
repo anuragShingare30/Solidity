@@ -1000,20 +1000,29 @@ contract setData {
 10. Testing smart contract on Testnet
 
 
+
+
+
 ### INSTALLING TRUFFLE AND INITIALLIZING THE PROJECT
 
+<!-- install truffle -->
 - npm install -g truffle (globally)
 - mkdir project_name
 - truffle init
 - npm init -y
 - echo "node_modules" > .gitignore
 - npm i --save @openzeppelin/contracts
+
+<!-- install ganache -->
 - npm i --global ganache
 - truffle compile 
 - ganache  (initialize ganache)
 
-<!-- unit testing of sc -->
+<!-- truffle console -->
 - truffle migrate --network ganache (deploy our sc using ganache)
+- truffle console --network ganache
+
+<!-- unit testing of sc inside truffle console-->
 - truffle console --network ganache (opens the js provided ganache-truffle console)
 - migrate (inside the ganache console)
 - test (inside the ganache console)
@@ -1026,7 +1035,7 @@ contract setData {
 
 <!-- deploy using metamask and truffle dashboard -->
 - truffle dashboard
-- truffle migrate --network dashboard
+- truffle migrate --network dashboard 
 
 <!-- verify -->
 - npm install -D truffle-plugin-verify
@@ -1044,5 +1053,11 @@ contract setData {
 <!-- debugging (using truffle debugger)-->
 - ganache --fork.network sepolia
 - truffle debug <TXHASH> --network ganache --fetch-external
+
+<!-- for ganache mainchain forking -->
+- can fork mainchain/ testnet
+- ganache downloads the code
+- ganache offers debug-trace transaction rpc call (normal blockchain node do not offers this)
+
 - Hit return a few times to see the actual execution of the code.
-- Hit h for help and v for the current variables:
+- Hit h for help and v for the current variables
