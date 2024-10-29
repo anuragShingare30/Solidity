@@ -1005,7 +1005,9 @@ contract setData {
 
 ### INSTALLING TRUFFLE AND INITIALLIZING THE PROJECT
 
-<!-- install truffle -->
+
+#### INSTALLING TRUFFLE
+
 - npm install -g truffle (globally)
 - mkdir project_name
 - truffle init
@@ -1013,46 +1015,358 @@ contract setData {
 - echo "node_modules" > .gitignore
 - npm i --save @openzeppelin/contracts
 
-<!-- install ganache -->
-- npm i --global ganache
-- truffle compile 
-- ganache  (initialize ganache)
 
-<!-- truffle console -->
-- truffle migrate --network ganache (deploy our sc using ganache)
-- truffle console --network ganache
+#### INSTALLING GANACHE
 
-<!-- unit testing of sc inside truffle console-->
-- truffle console --network ganache (opens the js provided ganache-truffle console)
-- migrate (inside the ganache console)
-- test (inside the ganache console)
+- This initialize the ganache rpc server
+```js
+npm i --global ganache
+ganache 
+```
 
-<!-- deploy sc on infura/Hd wallet provider -->
-- npm i @truffle/hdwallet-provider (to deploy our sc on blockchain network) using **HD wallet provider such as infura**
-- truffle migrate --network sepolia
-- truffle console --network sepolia (to deploy our sc on public network)
+- **add a network called "ganache" to the truffle-config.js file**
 
-
-<!-- deploy using metamask and truffle dashboard -->
-- truffle dashboard
-- truffle migrate --network dashboard 
-
-<!-- verify -->
-- npm install -D truffle-plugin-verify
-- truffle run verify Web3 --network sepolia (for infura and hd wallet provider)  
-- truffle run verify Web3 --network dashboard (for truffle dashboard)   
-
-<!-- optimizer -->
-- reduces the gas needed for contract deployment as well as for external calls made to the contract.
-
-<!-- debugging (using console)-->
-- npm install @ganache/console.log
-- import "@ganache/console.log/console.sol";
+```js
+// ganache-cli opens an RPC listener on Port 8545
+module.exports = {
+    networks: {
+        ganache: {
+            host: "127.0.0.1",     // Localhost (default: none)
+            port: 8545,            // Standard Ethereum port (default: none)
+            network_id: "*",       // Any network (default: none)
+        },
+    }
+}
+```
 
 
-<!-- debugging (using truffle debugger)-->
-- ganache --fork.network sepolia
-- truffle debug <TXHASH> --network ganache --fetch-external
+#### MIGRATION FILE
+
+- In truffle, we will use migration to deploy our sc.
+
+```js
+// migrations/01-web3-deployment.js
+const Web3 = artifacts.require("Web3");
+
+module.exports = function(deployer,network,accounts){
+    deployer.deploy(Web3, {from:accounts[0]});
+}
+```
+
+- **artifacts.require** function will scan the contents of the build/contracts folder from json and extract all relevant function from json.
+
+
+
+
+#### TRUFFLE CONSOLE (GANACHE-CLI)
+
+- Truffle has an integrated and interactive JavaScript console using ganache.
+
+```js
+// deploy our sc on ganache
+truffle migrate --network ganache
+// inititalize console
+truffle console --network ganache
+```
+
+- Now, inside the console we can interact with our smart contract.
+- **Run "migrate" to redeploy our sc inside console**
+
+
+#### INTERACT WITH SC IN TRUFFLE CONSOLE
+
+```js
+// Create a new contract instance:
+let token = await Web3.deployed();
+
+// Truffle will scan the complete build artifacts directory and inject all contracts with their ABI and addresses directly in the console.
+token.name();
+
+// This way you can also mint an NFT
+let accounts = await web3.eth.getAccounts();
+await token.publicMint(accounts[0], 0.1 ether);
+```
+- Here **contract instance** will make a call (which you can see in Ganache) and return the output stored in the contract.
+
+
+#### UNIT TESTING IN TRUFFLE (JS)
+
+```js
+// TO TEST OUR SC
+truffle console --network ganache
+migrate
+test
+```
+
+- Truffle can do tests in JavaScript.
+
+```js
+// test/Web3.test.js
+const Web3 = artifacts.require("Web3");
+
+contract("Web3", (accounts)=>{
+    // first test check
+    it("compare the two addresses for transaction" , async ()=>{
+        let token = await Web3.deployed();
+        assert.equal(accounts[0],accounts[1],"Alert!!! Transaction fraud");
+    });
+
+    // second test check
+    it("Testing sample smart contract", async ()=>{
+        let token = await Web3.deployed();
+        let tokenName = await token.name();
+        console.log(tokenName);
+    });
+})
+```
+
+- **Here each it(...) function represents new test, which expects a function as second parameter.**
+
+- Here, contract function gets all accounts which are injected by Truffle by doing a web3.eth.getAccounts() before starting the test.
+- truffle uses Mocha, here instead of 'describe' we will use 'contract'.
+- Truffle will automatically redeploy the contracts based on the migrations files to offer so called **"clean room testing"**
+
+
+
+#### UNIT TESTING IN TRUFFLE (Solidity)
+
+- You can't choose the account you're sending the TX from in Solidity. 
+- You can't modify anything on the chain. 
+- You can't listen to events.
+
+
+
+
+#### Deploy Smart Contracts to a real Network (HD WALLET PROVIDER/INFURA/ALCHEMY)
+
+- This is the most standard way to deploy sc which is also followed by hardhat and foundary also.
+- Here, We start with Infura to deploy the Smart Contract
+
+
+
+- We sign up with a service(**Infura**) that hosts these blockchain nodes and get access.
+- The first thing we need to do is instruct Truffle to sign a transaction before sending it (using HDWALLET-PROVIDER)
+
+```js
+npm install @truffle/hdwallet-provider
+touch .secret
+echo ".secret" >> .gitignore
+touch .infura
+echo ".infura" >> .gitignore
+```
+
+- **.secret** : Add the secretPhrase from our metamask.
+- **.infura** : Add the infura_project_id from infura dashboard
+ 
+
+- Here, we will not use '.env' because it is not good practice in terms of security.
+- We will use 'fileSystem' to store our key.
+- Use the **HDWalletProvider** in your network configuration.
+
+```js
+//  tailwind-config.js
+const HDWalletProvider = require("@truffle/hdwallet-provider");
+const fs = require('fs');
+const mnemonicPhrase = fs.readFileSync(".secret").toString().trim();
+const infuraProjectID = fs.readFileSync(".infura").toString().trim();
+
+
+module.exports = {
+    // ...
+    networks:{
+        sepolia: {
+            provider: () => new HDWalletProvider(mnemonicPhrase, `https://sepolia.infura.io/v3/${infuraId}`),
+            network_id: 11155111,  // Sepolia's id
+            confirmations: 2,      // # of confirmations to wait between deployments. (default: 0)
+            timeoutBlocks: 200,    // # of blocks before a deployment times out  (minimum/default: 50)
+            skipDryRun: true       // Skip dry run before migrations? (default: false for public nets)
+      },
+    }
+}
+```
+
+
+- **Deploy our sc on sepolia using migrate**
+
+```js
+// inside truffle-console
+truffle migrate --network goerli
+truffle console --network goerli
+```
+
+
+
+
+#### Deploy Smart Contracts to a real network (Truffle Dashboard and METAMASK)
+
+- We will use MetaMask to do the actual interaction with a blockchain. It's in there for a while, but not used very widely.
+
+- Start with,
+```js
+// This will open an RPC tunnel to a website where MetaMask can connect to
+truffle dashboard
+truffle migrate --network dashboard
+```
+
+- **in this method we are not required to define the network in tailwind-config.js file**
+
+
+
+
+#### Smart Contract Source Code Verification on Etherscan
+
+- login to your etherscan account and copy the API key.
+- Save API key in .env or in fileSystem.
+
+```js
+npm install -D truffle-plugin-verify
+
+//   tailwind-config.js
+module.exports = {
+  /* ... rest of truffle-config */
+  plugins: ['truffle-plugin-verify'],
+  api_keys:{
+    etherScanId:process.env.ETHERSCAN_ID,
+  },
+}
+```
+
+- Simply, run the following command in terminal
+```js
+// FOR INFURA
+truffle run verify Spacebear --network sepolia
+
+// FOR DASHBOARD AND METAMASK
+truffle run verify Spacebear --network dashboard
+```
+
+
+#### Solidity Optimizer¶
+
+- Reduces the gas needed for contract deployment as well as for external calls made to the contract.
+
+
+```js
+module.exports = {
+    //...
+    compilers: {
+    solc: {
+      version: "0.8.16",      // Fetch exact version from solc-bin (default: truffle's version)
+      // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
+      settings: {          // See the solidity docs for advice about optimization and evmVersion
+       optimizer: {
+        enabled: false,
+        runs: 200
+      },
+      //  evmVersion: "byzantium"
+      // }
+    }
+  },
+}
+```
+
+
+#### FINAL tailwind-config.js
+
+- Most of the time the **tailwind-config.js** will look like:
+
+```js
+// tailwind-config.js
+const HDWalletProvider = require("@truffle/hdwallet-provider");
+const fs = require('fs');
+const mnemonicPhrase = fs.readFileSync(".secret").toString().trim();
+const infuraProjectID = fs.readFileSync(".infura").toString().trim();
+
+module.exports = {
+
+    plugins: ['truffle-plugin-verify'],
+  api_keys: {
+    etherscan: fs.readFileSync(".etherscan").toString().trim()
+  },
+
+  networks: {
+
+    // GANACHE
+    ganache:{
+      host:"127.0.0.1",
+      port:8545,
+      network_id:"*",
+    },
+    // SEPOLIA
+    sepolia: {
+      provider: () => new HDWalletProvider(mnemonicPhrase, `https://sepolia.infura.io/v3/${infuraId}`),
+      network_id: 11155111,  // Sepolia's id
+      confirmations: 2,      // # of confirmations to wait between deployments. (default: 0)
+      timeoutBlocks: 200,    // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true       // Skip dry run before migrations? (default: false for public nets)
+  },
+},
+
+  // Set default mocha options here, use special reporters, etc.
+  mocha: {
+    // timeout: 100000
+  },
+
+  // Configure your compilers
+  compilers: {
+    solc: {
+      version: "0.8.16",      // Fetch exact version from solc-bin (default: truffle's version)
+      // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
+      settings: {          // See the solidity docs for advice about optimization and evmVersion
+       optimizer: {
+         enabled: false,
+         runs: 200
+       },
+      //  evmVersion: "byzantium"
+      }
+    }
+  },
+};
+
+```
+
+
+
+#### Debugging During Smart Contract Development (console.log)
+
+```js
+npm install @ganache/console.log
+
+// import 
+import "@ganache/console.log/console.sol";
+```
+- Start using the 'console.log' in your smart contract for debugging.
+
+```js
+ganache
+truffle console --network ganache
+migrate
+```
+
+- Try to mint an NFTs and you will see your console.log on the **ganache server**
+
+
+
+#### Debugging already deployed Smart Contracts with Forking (Truffle Debugger)
+
+- There it is, your contract, on Mainnet. But suddenly users are reporting a bug. Something isn't right.
+- because your users funds are at stake, after all...
+
+
+- Now,
+- **Ganache can fork the mainchain** 
+- **Truffle can debug smart contracts without even having the source code locally**
+
+
+```js
+// Pick any recent transaction from Etherscan and check it is verified smart contract.
+ganache --fork.network sepolia
+
+// Then you can use truffle to connect to Ganache, which will happily serve the requests.
+truffle debug <TXHASH> --network ganache --fetch-external
+```
+
+- You can get the **TXHASH** from **Web3.json** file in networks object.
 
 <!-- for ganache mainchain forking -->
 - can fork mainchain/ testnet
@@ -1061,3 +1375,45 @@ contract setData {
 
 - Hit return a few times to see the actual execution of the code.
 - Hit h for help and v for the current variables
+
+
+
+
+
+
+
+
+
+### INSTALLING HARDHAT
+
+- npm install --save-dev hardhat
+- npx hardhat init
+- npm i --save @openzeppelin/contracts
+- npx hardhat compile
+
+<!-- set your api_keys on 'var' -->
+```js 
+const { vars } = require("hardhat/config"); 
+```
+
+- npx hardhat vars set INFURA_API_KEY
+
+<!-- deploying locally-->
+- npx hardhat node
+- npx hardhat ignition deploy ./ignition/modules/Lock.js --network localhost
+
+<!-- deploying on sepolia testnet -->
+- npx hardhat node
+- npx hardhat ignition deploy ./ignition/modules/Token.js --network sepolia
+
+<!-- verify sc on etherscan -->
+- npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS
+
+<!-- unit test using ethers.js and mocha and chai -->
+- npx hardhat test
+
+<!-- for debugging of sc -->
+- we can use console.log
+```js
+import "hardhat/console.sol";
+```
