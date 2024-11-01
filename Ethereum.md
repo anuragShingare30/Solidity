@@ -5,7 +5,7 @@
 
 - Here we will see the simple layout and structure to write the solidity smart contracts.
 
-```js
+```solidity
 pragma solidity ^0.8.0;
 
 contract MyFirstContract {
@@ -23,7 +23,7 @@ contract MyFirstContract {
 
 - Variables in sol is similar to javascript. Except address.
 
-```js
+```solidity
 uint8 , uint16, uint128, uint256;
 
 string public str = "Hello world";
@@ -38,7 +38,7 @@ bool public correct = true/false;
 
 - When we are using 'string' as a parameter in our function define **memory** to allocate the memory to our string.
 
-```js
+```solidity
 string public myString = "Hello world";
 
 function getMyString(string memory _myString) public {
@@ -49,7 +49,7 @@ function getMyString(string memory _myString) public {
 
 - Bytes have the length property.
 
-```js
+```solidity
 bytes public myBytes = "Hello";
 
 // myBytes = 0x72375375bc758734784c834874
@@ -60,7 +60,7 @@ bytes public myBytes = "Hello";
 
 1. Here we will discuss the basic functions to write simple smart contracts.
 
-```js
+```solidity
 uint256 result;
 
 function addition(uint256 a, uint256 b) public returns(uint256){
@@ -70,7 +70,7 @@ function addition(uint256 a, uint256 b) public returns(uint256){
 
 2. When we are just returning an variable inside an function we will use 'view' keyword.
 
-```js
+```solidity
 function get() public view returns (uint256){
     return result;
 }
@@ -83,7 +83,7 @@ function get() public view returns (uint256){
 1. **Public** : Can be used internally and externally.
 - Our metamask wallet and other smart contracts can call this type of function.
 
-```js
+```solidity
 function addition() public {
     result+=10;
 }
@@ -91,7 +91,7 @@ function addition() public {
 
 2. **Private** : Can be used within contract.
 
-```js
+```solidity
 uint256 result = 0;
 
 function addition() private {
@@ -104,7 +104,7 @@ function addition() private {
 - But, inheriting contracts can used this function.
 
 
-```js
+```solidity
 
 contract Children {
 
@@ -129,7 +129,7 @@ contract Parent is Children {
 - We cannot used this function internally inside an other function.
 - Our metamask wallet can accessed this type of function.
 
-```js
+```solidity
 function add(uint256 num) external {
     result += num;
 }
@@ -141,7 +141,7 @@ function add(uint256 num) external {
 
 #### NOTE : The default behavior to error out if the maximum/minimum value is reached. But you can still enforce this behavior. With an 'unchecked' block. Let's see an example.
 
-```js
+```solidity
 
 uint256 num; // by default it is 0
 
@@ -163,7 +163,7 @@ function Test2() public {
 - It is a special function that is called only once during contract deployment.
 - It is automatically called during Smart Contract deployment. And it can never be called again after that.
 
-```js
+```solidity
 constructor(uint256 _myaddress) {
     owner = _myaddress;
     
@@ -176,7 +176,7 @@ constructor(uint256 _myaddress) {
 
 - The payable modifier tells solidity that the function is expecting eth to receive.
 
-```js
+```solidity
 
 string public myMessage;
 function getMessage(string memory _myMessage) public payable {
@@ -191,7 +191,7 @@ function getMessage(string memory _myMessage) public payable {
 - The msg-object contains information about the current message with the smart contract. 
 - It's a global variable that can be accessed in every function.
 
-```js
+```solidity
 string public myMessage = "Hello World";
 
 function updateString(string memory myMessage) public payable {
@@ -217,7 +217,7 @@ function updateString(string memory myMessage) public payable {
 - The receive function can only rely on 2300 gas being available.
 
 
-```js
+```solidity
 uint public value;
 string public message;
 
@@ -237,7 +237,7 @@ receive() external payable {
 - If Ether is sent to the contract without any data or with data that doesn't match any existing function signatures, the fallback function is triggered
 
 
-```js
+```solidity
 uint public value;
 string public message;
 
@@ -262,7 +262,7 @@ fallback() external payable {
 - To send ETH on specific address we can use **transfer function**
 
 
-```js
+```solidity
 address payable toAddress;
 toAddress.transfer(amountToSend);
 ```
@@ -285,7 +285,7 @@ toAddress.transfer(amountToSend);
 - It is an key and value datatype that does not have lenght or storage property.
 
 
-```js
+```solidity
 mapping (address => uint) public Balance;
 
 function sendMoney() public payable {
@@ -311,7 +311,7 @@ function withDrawMoney(address to, uint amount) public payable {
 - Solidity uses structs to define new datatypes and group several variables together.
 - A struct is a way to generate a new DataType, by basically grouping several simple Data Types together.
 
-```js
+```solidity
 
 // Defining struct
 struct PaymentReceipt {
@@ -340,7 +340,7 @@ payment.amount = msg.value;
 
 - Now, we will nest an map in an struct, so that it will become more easy and powerful to use struct with mappings.
 
-```js
+```solidity
 struct Transaction {
     uint amount;
     uint timestamp;
@@ -376,7 +376,7 @@ function checkBalance(address _address) public view returns (uint){
 
 - Just like an array in JS, arrays is solidity work exactly same.
 
-```js
+```solidity
 contract SampleArray {
     
     uint[] public dynamicArray;
@@ -409,7 +409,7 @@ contract SampleArray {
 
 - An array can be of any data type (including **struct**) stored at specific index.
 
-```js
+```solidity
 
 struct StudentReport{
     string name;
@@ -444,7 +444,7 @@ function getReportCard() public view returns(StudentReport[] memory){
 - It read as if condition is false it will throw an error exception with log statement.
 - And, if it is true it will execute the remaining code.
 
-```js
+```solidity
 
 mapping (address => uint) public Balance;
 
@@ -469,7 +469,7 @@ function withDrawMoney(address payable to, uint amount) public payable {
 - Assert is used to check invariants
 - Those are states our contract or variables should never reach, ever.
 
-```js
+```solidity
 
 mapping (address => uint8) public Balance;
 
@@ -492,7 +492,7 @@ function withDrawMoney(address payable to, uint8 amount) public payable {
 
 3. **try/catch statements**
 
-```js
+```solidity
 
 contract ExampleTryCatch {
 
@@ -531,7 +531,7 @@ contract ErrorHandling {
 
 
 
-```js
+```solidity
 contract ContractOne {
 
     mapping (address => uint) public Balance;
@@ -572,14 +572,14 @@ contract ContractTwo {
 
 1. WITHOUT FALL-BACK FUNCTION
 
-```js
+```solidity
 ContractOne one = ContractOne(to);
 one.deposit{value:amount, gas:100000}();
 ```
 
 2. WITH FALL-BACK FUNCTION
 
-```js
+```solidity
 (bool send,) = to.call{value:amount, gas:100000}("");
 require(send);
 ```
@@ -591,7 +591,7 @@ require(send);
 - This provide logging facility of Ethereum.
 - Events are a way to access this logging facility
 
-```js
+```solidity
 // SAMPLE SMART CONTRACT TO UNDERSTAND THE EVENTS.
 contract Events {
     mapping(address => uint) public Balance;
@@ -619,7 +619,7 @@ contract Events {
 
 - Let's see a simple smart contract and how we can use the modifiers, inheritance and imports in our smart contracts.
 
-```js
+```solidity
 // InheritedContract.sol
 contract InheritedContract{
 
@@ -673,7 +673,7 @@ contract InheritedContract is InheritedContract {
 - To avoid code duplication and make it easier to change this from a single place, we can use modifiers
 
 
-```js
+```solidity
 modifiers onlyOwner(){
     require(msg.sender == owner, "You are not allowed");
     _;
@@ -689,7 +689,7 @@ function sendTokens() public onlyOwner{
 - By inheritance we can make two or more smart contracts.
 - And, we can use the function of second inherited smart contract.
 
-```js
+```solidity
 contract Owned {
     address owner;
 
@@ -715,7 +715,7 @@ contract Sample is Owned{
 
 - Now, we export smart contract from one file to another using importing.
 
-```js
+```solidity
 // Ownerable.sol
 
 contract Owned {
@@ -750,7 +750,7 @@ contract SampleSmartContract is Owned {
 - Sometimes we are required different smart contract to handle some conditions necessary to our DApps.
 - Just like in (ReactJs -> Componenets) we have smart contract to handle conditions.
 
-```js
+```solidity
 
 contract ContractA {
     uint data;
@@ -791,7 +791,7 @@ contract ContractB {
 - To withdraw money,
 
 
-```js
+```solidity
 function withDrawMoney(address _address) external payable {
     uint balance = address(this).balance;
     payable(_address).transfer(balance);
@@ -821,7 +821,7 @@ function withDrawMoney(address _address) external payable {
 - **ABI ARRAY** provides web3js, what functions are present in smart contract.
 - The **ABI Array** contains all functions, inputs, as well as all variables and their types from a smart contract
 
-```js
+```solidity
 // THIS IS THE SIMPLE EXAMPLE OF ABI ARRAY.
 let abiArray = [
 	{
@@ -848,7 +848,7 @@ let abiArray = [
 - **web3.eth** provide us different methods/functions to interact with smart contract
 
 
-```js
+```solidity
 // TO GET THE ACCOUNTS
 (async () => {
   const accounts = await web3.eth.getAccounts();
@@ -859,7 +859,7 @@ let abiArray = [
 
 - To interact with smart contract we have,
 
-```js
+```solidity
 
 // SAMPLE SMART CONTRACT
 contract setData {
@@ -984,18 +984,24 @@ contract setData {
     ]
 }
 
-
 ```
-### TOPICS COVERED IN ERC - 721, 1155, 721A (Ethereum Request for Comment)
 
-- **Token** is a representation of something in the digital or physical world that resides on the Ethereum blockchain
-- Managed by a smart contract, which is a program on Ethereum, a token can represent just about anything. 
-- **It can be fungible(cryptocurrency) and non-fungible(NFT)**
+- We can see our minted and deployed NFT on opensea (Testnet) through Etherscan and also on our Metamask portfolio.
 
-- **FUNGIBLE** : This are cryptocurrencies like Bitcoin(BTC), Ethereum(ETH).
+
+
+### Fungible and Non-fungible(NFT) token
+
+1. **Fungible tokens(cryptocurrencies)** : These tokens are identical and can be exchanged for one another with equal value. Think of fungible tokens like currency
 - interchangeable, identical in value (e.g., money).
-- **NON-FUNGIBLE** : This are units of data that represent a unique digital asset stored and verified on the blockchain.
+
+2. **Non-fungible tokens(NFTs)** : These tokens are unique and cannot be exchanged on a one-to-one basis for something of equal value because each one has its distinct attributes.
+- NFTs are often used to represent digital art, collectibles, or unique assets
+- like a serial number or unique content
 - unique, distinct in value (e.g., a rare collectible).
+
+
+### TOPICS COVERED IN ERC - 721, 1155, 721A (Ethereum Request for Comment)
 
 1. public mint function
 2. mint multiple nfts
@@ -1007,6 +1013,225 @@ contract setData {
 8. MAX LIMIT PER WALLET
 9. Refund functionality and Refund time period
 10. Testing smart contract on Testnet
+
+
+
+### TOKENS(ERC-20,721,1155,1155A)
+
+- **Token** is a representation of something in the digital or physical world that resides on the Ethereum blockchain
+- Managed by a smart contract, which is a program on Ethereum, a token can represent just about anything. 
+- **It can be fungible(cryptocurrency) and non-fungible(NFT)**
+
+
+
+#### ERC-20(Fungible) TOKEN
+
+- ERC20 is a standard for **fungible** tokens, which are all identical and interchangeable.
+- For tokens where every unit is the same (like currency).
+
+**EXAMPLE**
+- ERC20 is exactly the same as any other ERC20, just like how one dollar is the same as another dollar.
+
+
+```solidity
+// ERC-20 TOKEN SAMPLE CONTRACT FROM OZ
+contract Web3 is ERC20, Ownable {
+    constructor()
+        ERC20("Web3", "ERC20")
+        Ownable(msg.sender)
+    {
+        _mint(msg.sender, 10000 * 10 ** decimals());
+    }
+    
+}
+```
+- A simple ERC20 token sample contract. Here, we can add minting,burning and allowance function further more...
+
+
+
+#### ERC-721(Non-Fungible) TOKEN
+
+- **For ERC721 you have one address that has many tokens and all unique. The SC also works same**.
+
+- ERC721 is a standard for non-fungible tokens, meaning each token is unique and cannot be exchanged one-for-one with another.
+- Each NFT has its own value based on its uniqueness.
+- For unique, one-of-a-kind items (like art or collectibles).
+
+
+**EXAMPLE**
+- Think of an NFT for a unique piece of digital artwork. If you have a token representing **DigitalArt#1**, it's unique and can't just be swapped for **DigitalArt#2**
+
+
+
+
+#### ERC-1155(Fungible and Non-Fungible) TOKEN
+
+- **ERC1155** is a flexible standard that allows both **fungible and non-fungible** tokens within the **same smart contrac**t.
+- This means you can create tokens that are all the same, all unique, or even some of each!
+- A mix, allowing both identical and unique items in one contract 
+
+
+**EXAMPLE**
+- Imagine a game where you have coins(fungible) and weapons(non-fungible).
+- With ERC1155, you can have GameCoins(all identical) and unique items like rare swords or shields, all in one place. 
+
+
+
+#### COMMON FUNCTION IN ABOVE TOKENS
+
+
+1. **PUBLIC MINT FUNCTION**
+
+```solidity
+function publicMint() public payable {
+    require(true | false, "Minting is closed!!!");
+    require(msg.value == 0.1 ether, "Not enough funds!!!");
+    require(totalSupply() < 5, "We sold out!!!");
+    uint256 tokenId = _nextTokenId++;
+    _safeMint(msg.sender, tokenId);
+}
+```
+
+2. **ALLOWLIST MINTING**
+
+```solidity
+function allowListMint() public payable {
+    require(allowListAddress[msg.sender], "You are not in allow list!!!");
+    require(true | false, "Minting is closed!!!");
+    require(msg.value == 0.01 ether, "Not enough funds!!!");
+    require(totalSupply() < 5, "We sold out!!!");
+    uint256 tokenId = _nextTokenId++;
+    _safeMint(msg.sender, tokenId);
+}
+```
+
+3. **WITHDRAW FUNCTION**
+
+```solidity
+function withDrawMoney(address _address) external payable {
+    uint balance = address(this).balance;
+    payable(_address).transfer(balance);
+}
+```
+
+4. **SET ALLOWLIST ADDRESS**
+
+```solidity
+mapping(address => bool) public allowListAddress;
+function setAllowList(address[] memory addresses) external  onlyOwner{
+    for(uint i=0;i<addresses.length;i++){
+        allowListAddress[addresses[i]] = true;
+    }
+}
+```
+
+5. **PUBLIC MINTING (ERC-1155)**
+
+- THE **amount** REFERS TO TOTAL NO. OF NFTs TO BE MINTED.
+
+```solidity
+uint constant public maxPurchasePerWallet = 3;
+
+function publicMint(uint256 id, uint256 amount) public payable {
+    require(true | false, "Minting is closed!!!");
+    require(purchasePerWallet[msg.sender] + amount <= maxPurchasePerWallet, "MAX LIMIT PER WALLET REACHED");
+    // by this require we can mint multiple nfts
+    require(msg.value == (amount * 2 ether), "NOT ENOUGH MONEY SENT!!!");
+    require(totalSupply(id) + amount <= maxSupply, "SORRY! WE MINTED OUT.");
+    require(id < 5, "YOU ARE TRYING TO MINT WRONG NFTs");
+    _mint(msg.sender, id, amount, "");
+}
+```
+
+- **AllowListMint** function is same just add mapping of allowlist addresses.
+
+
+6. **ADD URI FUNCTION (ERC1155)**
+
+- This will return us the link for our **NFT Metadata through IPFS**
+- We have added the IPFS Link this function will append NFT id and .json extension
+
+```solidity
+function uri(uint256 _id) public view virtual override returns (string memory){
+    require(exists(_id), "URI : NOT EXIST");
+    return
+        string(
+            abi.encodePacked(super.uri(_id), Strings.toString(_id), ".json")
+        );
+}
+```
+
+
+7. **PAYMENT SPLITTER (ERC-1155)**
+
+- IT SPLITS BETWEEN THE ADDRESS(_payees) FOR SHARES(_shares).
+- WE WILL ADD **address_array and shares_array** DURING DEPLOYMENT. 
+
+```solidity
+constructor(address[] memory _payees, uint[] memory _shares)
+    ERC1155("ipfs://Qmaa6TuP2s9pSKczHF4rwWhTKUdygrrDs8RmYYqCjP3Hye/")
+    Ownable(msg.sender)
+    PaymentSplitter(_payees,_shares)
+    {
+
+    }
+```
+- This can be integrated in our DApps.
+
+
+
+8. **PUBLIC MINT (ERC-721A)**
+
+```solidity
+function publicMint(uint256 amount) public payable  {
+    require(msg.value == (publicPrice * amount),"NOT ENOUGH MONEY!!!");
+    // returns the number of tokens minted by 'owner'
+    require(_numberMinted(msg.sender) + amount < maxMintPerUser, "SORRY LIMIT REACHED FOR MINTING NFTs!!!");
+    // returns the total amount of tokens minted in the contract
+    require(_totalMinted() <= maxNFTMinting, "WE SOLD OUT!!!");
+    _safeMint(msg.sender, amount);
+
+    refundEndTimeStamp = block.timestamp + refundPeriod;
+    for(uint i = _currentIndex - amount; i<_currentIndex; i++){
+        refundEndTimeStamps[i] = refundEndTimeStamp;
+    }
+}
+```
+
+9. **REFUND FUNCTIONALITY**
+
+```solidity
+// refund functionality
+function refund(uint tokenId) external payable {
+    // check token expiry time stamp
+    require(getTokenTimeStamp(tokenId) > block.timestamp, "REFUND PERIOD EXPIRED!!!");
+    // you should be the owner of tokenid
+    require(msg.sender == ownerOf(tokenId), "YOU ARE NOT THE OWNER OF THIS TOKEN");
+
+    // mark the refund
+    hasRefunded[tokenId] = true;
+
+    // Transfer Ownership of nft
+    _transfer(msg.sender, refundAddress, tokenId);
+
+    // refund the price
+    uint refundAmount = getRefundAmount(tokenId);
+    payable(msg.sender).transfer(refundAmount);
+}   
+
+
+// GET REFUND AMOUNT
+function getRefundAmount(uint tokenId) public view returns (uint){
+    if(hasRefunded[tokenId]){
+        return 0;
+    }
+    return publicPrice;
+}
+```
+
+
+
+
 
 
 
