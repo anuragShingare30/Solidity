@@ -984,16 +984,18 @@ contract setData {
     ]
 }
 
-```
 
+```
 ### TOPICS COVERED IN ERC - 721, 1155, 721A (Ethereum Request for Comment)
 
-- A representation of something in the digital or physical world that resides on the Ethereum blockchain
+- **Token** is a representation of something in the digital or physical world that resides on the Ethereum blockchain
 - Managed by a smart contract, which is a program on Ethereum, a token can represent just about anything. 
 - **It can be fungible(cryptocurrency) and non-fungible(NFT)**
 
 - **FUNGIBLE** : This are cryptocurrencies like Bitcoin(BTC), Ethereum(ETH).
+- interchangeable, identical in value (e.g., money).
 - **NON-FUNGIBLE** : This are units of data that represent a unique digital asset stored and verified on the blockchain.
+- unique, distinct in value (e.g., a rare collectible).
 
 1. public mint function
 2. mint multiple nfts
@@ -1220,7 +1222,7 @@ truffle migrate --network dashboard
 
 
 
-#### Smart Contract Source Code Verification on Etherscan
+#### Verification of SC on Etherscan
 
 - login to your etherscan account and copy the API key.
 - Save API key in .env or in fileSystem.
@@ -1567,6 +1569,7 @@ npx hardhat ignition deploy ./ignition/modules/deploy.cjs --network sepolia
 - Ignition modules are written inside **./ignition/modules directory.**
 
 ```js
+// ./ignition/modules/deploy.js
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 
 const TokenModule = buildModule("TokenModule", (m) => {
@@ -1587,8 +1590,10 @@ module.exports = TokenModule;
 require("@nomicfoundation/hardhat-toolbox");
 const { vars } = require("hardhat/config");
 
-// const fs = require("fs");
-// const SEPOLIA_PRIVATE_KEY = fs.readFileSync(".private_key").toString().trim();
+// SET YOUR API KEY IN VARS AND NOT IN .ENV
+// npx hardhat vars set API_KEY_NAME
+
+
 const INFURA_API_KEY = vars.get("INFURA_API_KEY");
 const SEPOLIA_PRIVATE_KEY = vars.get("SEPOLIA_PRIVATE_KEY");
 
@@ -1641,5 +1646,15 @@ npx hardhat ignition verify sepolia-deployment
 
 
 
+### LIQUIDITY POOL (moneyjar -> smart contract)
 
+- A liquidity pool on the Ethereum blockchain is like a big **money jar** filled with two types of tokens (ETH AND ERC-20).
+- Here, people can trade directly with this jar, making it much faster and easier.
+- Anyone who wants to trade ETH for DAI (or DAI for ETH) can use this jar.
 
+#### Process followed when Pool is created and its Trading
+
+1. **Creating Pool(Uniswap)** : A **liquidity pool** is created by someone who puts both **ETH and ERC** into a digital jar **(smart contract)** on platform like Uniswap.
+2. **Trading** : Now, anyone who wants to trade ETH for DAI (or DAI for ETH) can use this smart contract(jar)
+3. **Swapping** : When someone swaps ETH for DAI, the pool takes in ETH and gives out DAI.
+4. **Pricing** : The prices adjust automatically based on how much ETH and DAI are in the jar.
