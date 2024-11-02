@@ -1233,9 +1233,6 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 
 
 
-
-
-
 ### TRUFFLE
 
 
@@ -1320,6 +1317,8 @@ let accounts = await web3.eth.getAccounts();
 await token.publicMint(accounts[0], 0.1 ether);
 ```
 - Here **contract instance** will make a call (which you can see in Ganache) and return the output stored in the contract.
+**Note : Truffle will scan the complete build artifacts directory and inject all contracts with their ABI and addresses directly in the console**
+
 
 
 #### UNIT TESTING IN TRUFFLE (JS)
@@ -1331,7 +1330,7 @@ migrate
 test
 ```
 
-- Truffle can do tests in JavaScript.
+- Truffle can do tests in JavaScript and solidity
 
 ```js
 // test/Web3.test.js
@@ -1353,7 +1352,7 @@ contract("Web3", (accounts)=>{
 })
 ```
 
-- **Here each it(...) function represents new test, which expects a function as second parameter.**
+- **Here each it(...) function represents new test, which expects a function as second params and msg as first params**
 
 - Here, contract function gets all accounts which are injected by Truffle by doing a web3.eth.getAccounts() before starting the test.
 - truffle uses Mocha, here instead of 'describe' we will use 'contract'.
@@ -1390,6 +1389,7 @@ echo ".infura" >> .gitignore
 
 - **.secret** : Add the secretPhrase from our metamask.
 - **.infura** : Add the infura_project_id from infura dashboard
+- **.etherscan** : To verify our sc on etherscan
  
 
 - Here, we will not use '.env' because it is not good practice in terms of security.
@@ -1402,6 +1402,7 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 const fs = require('fs');
 const mnemonicPhrase = fs.readFileSync(".secret").toString().trim();
 const infuraProjectID = fs.readFileSync(".infura").toString().trim();
+const ETHERSCAN_ID = fs.readFileSync(".etherscan_id").toString().trim();
 
 
 module.exports = {
@@ -1423,8 +1424,8 @@ module.exports = {
 
 ```js
 // inside truffle-console
-truffle migrate --network goerli
-truffle console --network goerli
+truffle migrate --network sepolia
+truffle console --network sepolia
 ```
 
 
@@ -1870,11 +1871,13 @@ npx hardhat ignition verify sepolia-deployment
 
 
 
+
 ### LIQUIDITY POOL (moneyjar -> smart contract)
 
 - A liquidity pool on the Ethereum blockchain is like a big **money jar** filled with two types of tokens (ETH AND ERC-20).
 - Here, people can trade directly with this jar, making it much faster and easier.
 - Anyone who wants to trade ETH for DAI (or DAI for ETH) can use this jar.
+
 
 #### Process followed when Pool is created and its Trading
 
@@ -1882,3 +1885,30 @@ npx hardhat ignition verify sepolia-deployment
 2. **Trading** : Now, anyone who wants to trade ETH for DAI (or DAI for ETH) can use this smart contract(jar)
 3. **Swapping** : When someone swaps ETH for DAI, the pool takes in ETH and gives out DAI.
 4. **Pricing** : The prices adjust automatically based on how much ETH and DAI are in the jar.
+
+
+
+
+### NFT STAKING SMART CONTRACT (ERC-20 AND ERC-721)
+
+**In, NFT staking sc we will use both ERC20 and ERC721 token**
+
+- An NFT staking sc is a type of program on the blockchain that allows **NFT holders(ERC721)** to **stake(or lock up)** their NFTs **in the contract for a certain period of time.**
+- In exchange, they earn rewards, usually in the **form of tokens(ERC20)** or other benefits.
+- It’s a way for NFT owners to gain extra value from their NFTs without selling them.
+
+
+#### FLOW OF NFT STAKING SC
+
+- To understand the process flow we will consider some basic tokens and contract : 
+
+**Staking SmartContract(App)** : A contract with functions for staking, unstaking, and getting rewards (main function).
+**ERC-721(NFT)** : The NFT that users lock up for a set period when staking.
+**ERC-20(token)** : The reward token users earn when they unstake their NFTs.
+
+
+1. **STAKING** : NFT holders connect their wallets to the staking platform and select an NFT they want to stake.
+2. **Lock Period** : The NFT is locked and temporarily transferred to the smart contract for a specific time
+3. **Rewards** : For keeping their NFT staked, users earn rewards like tokens, points. 
+depending on the terms of the smart contract and company for which we are building
+4. **Unstaking** : When the lock period ends, users can withdraw their NFT and collect any rewards they earned.
