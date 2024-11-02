@@ -745,13 +745,13 @@ contract SampleSmartContract is Owned {
 
 
 
-### CONTRACT TO CONTRACT INTERACTION
+### CONTRACT TO CONTRACT INTERACTION (INTERFACE)
 
 - Sometimes we are required different smart contract to handle some conditions necessary to our DApps.
 - Just like in (ReactJs -> Componenets) we have smart contract to handle conditions.
 
 ```solidity
-
+// Test1.sol
 contract ContractA {
     uint data;
 
@@ -763,8 +763,7 @@ contract ContractA {
     }
 }
 
-
-
+// Test2.sol
 interface IContractA {
     function setData(uint _data) external;
     function getData() external view returns (uint);
@@ -772,7 +771,7 @@ interface IContractA {
 
 contract ContractB {
     IContractA public contractA;
-
+    // sc address wil be of the interfaced contract address
     constructor(address _smartcontractAddress) {
         contractA = IContractA(_smartcontractAddress);
     }
