@@ -263,8 +263,12 @@ fallback() external payable {
 
 
 ```solidity
+// 1.
 address payable toAddress;
 toAddress.transfer(amountToSend);
+
+// 2.
+payable(address.transfer(amount));
 ```
 
 - To receive an ETH on specific address, the address variable should also be an **payable**
@@ -913,9 +917,9 @@ contract setData {
 
 - From above code we can interact with smart contracts.
 
-1. **new web3.eth.Contract()  ->  myContract.methods.myMethod().call()**  To call an variable
+1. **new web3.eth.Contract()  ->  await myContract.methods.myMethod().call()**  To call an variable
 
-2. **new web3.eth.Contract() -> myContract.methods.myMethod({from:account[0]}).send()**  To update variable or function with params.
+2. **new web3.eth.Contract() -> await myContract.methods.myMethod({from:account[0]}).send()**  To update variable or function with params.
 
 
 
@@ -1912,3 +1916,118 @@ npx hardhat ignition verify sepolia-deployment
 3. **Rewards** : For keeping their NFT staked, users earn rewards like tokens, points. 
 depending on the terms of the smart contract and company for which we are building
 4. **Unstaking** : When the lock period ends, users can withdraw their NFT and collect any rewards they earned.
+
+
+
+
+### L1, L2 AND ROLL-UPS IN ETHEREUM BLOCKCHAIN
+
+
+1. **Layer1 (Main Blockchain Layer)**  -> **(Bitcoin, Ethereum, and Solana)**
+
+- the foundational blockchain layer, the core network where transactions are processed directly.
+- They each have their own rules, consensus mechanisms, and security.
+
+- **Problem** Layer 1 blockchains can get slow and expensive when there's high demand of tsx
+
+
+2. **LAYER2 (Secondary Layer on Top of Layer1)**  -> **(Polygon, Arbitrum, and Optimism)**
+
+- Layer2 solutions are built on top of Layer1 blockchains.
+- handle transactions faster and more cheaply.
+- They offload some transactions from the main chain and then submit them in batches to Layer 1.
+
+- **BENEFITS** :  Layer 2 can offer faster processing and lower fees,
+
+
+
+3. **Rollups (Special Type of Layer 2 Solution)**  ->  **Arbitrum, zkSync**
+
+- Rollups bundle many transactions together, process them on Layer 2, and then send a single, compact summary back to Layer 1 for finalization.
+- This reduces the number of transactions Layer 1 has to handle directly.
+
+- **BENEFITS** : Rollups improve scalability even more than regular Layer2s by minimizing amount of data sent to the main chain.
+
+
+
+### ORACLE PROBLEMS / SMART CONTRACT CONNECTIVITY PROBLEM
+
+- The **Oracle problems** refers to the connectivity issue of smart contract with the off-chain resources(such as market-data, api_calls, api-data) with on-chain.
+
+
+- **Blockchain Oracles** is any device that interacts with the off-chain world to provide external data or computation to smart contract.
+- We will not use **centralized computation or centralized oracle/node** for our extrenal data.
+
+- **Chainlink is a decentralized Oracle Network**
+- When a smart contract combines on-chain and off-chain data, can be defined as **hybrid smart contract**
+
+
+**Now, how this blockchain oracles work** :
+- With the help of **decentralized oracle network**
+- On off-chain, chainlink nodes will store external data from data-providers.
+- On on-chain, the chainlink node will transfer the data to **Reference contract** so that other contract can used this data.
+
+- Here, we will use the **chaillink functions** to get the external data for our smart contract
+- And, this chainlink function will be the future of DeFi apps.
+
+2. CHAINLINK VRF
+3. CHAINLINK AUTOMATION
+4. END-TO-END RELIABILITY(TAKE INPUT, RETURN OUTPUT)
+
+
+
+### MATH CONVERSIONS IN SOLIDITY
+
+- Converting the value of ETH to USD
+- As prog. language it does not **support floating point number**
+
+```solidity
+function getConversionRate(uint256 ethAmount) public view returns (uint256) {
+    // getPrice() function will return current eth price in usd.
+    uint256 ethPrice = getPrice();
+    uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
+    return ethAmountInUsd;
+}
+```
+
+**NOTE** : In solidity,  multiply before dividing to get better precision.
+
+
+
+### CREATING OUR OWN libraries(optional)
+
+- When a functionality can be commonly used, we can create a **library** to efficiently manage repeated parts of codes.
+- Use keyword **library** instead of **contract**.
+
+```solidity
+// PriceConverter.sol 
+
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+
+library PriceConverter {
+    function getPrice() internal view returns (uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+        (int256 answer) = priceFeed.latestRoundData();
+        return uint256(answer * 10000000000);
+    }
+
+    function getConversionRate(uint256 ethAmount) internal view returns (uint256) {
+        uint256 ethPrice = getPrice();
+        uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1000000000000000000;
+        return ethAmountInUsd;
+    }
+}
+```
+
+- Now, to use the library in our solidity file, we have:
+- Here, **msg.value** is first-parameter and value in parenthesis is second-parameter.
+
+```solidity
+import {PriceConverter} from "./PriceConverter.sol";
+using PriceConverter for uint256;
+
+require(msg.value.getConversionRate(123) >= minimumUsd, "didn't send enough ETH");
+```
+
+
+**NOTE : constant and immutable keyword are used for gas optimization in smart contract**
