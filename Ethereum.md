@@ -1340,7 +1340,13 @@ depending on the terms of the smart contract and company for which we are buildi
 - Converting the value of ETH to USD
 - As prog. language it does not **support floating point number**
 
-```solidity
+```js
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+function getPrice() internal view returns (uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+        (int256 answer) = priceFeed.latestRoundData();
+        return uint256(answer * 10000000000);
+}
 function getConversionRate(uint256 ethAmount) public view returns (uint256) {
     // getPrice() function will return current eth price in usd.
     uint256 ethPrice = getPrice();
@@ -1358,7 +1364,7 @@ function getConversionRate(uint256 ethAmount) public view returns (uint256) {
 - When a functionality can be commonly used, we can create a **library** to efficiently manage repeated parts of codes.
 - Use keyword **library** instead of **contract**.
 
-```solidity
+```js
 // PriceConverter.sol 
 
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
@@ -1381,7 +1387,7 @@ library PriceConverter {
 - Now, to use the library in our solidity file, we have:
 - Here, **msg.value** is first-parameter and value in parenthesis is second-parameter.
 
-```solidity
+```js
 import {PriceConverter} from "./PriceConverter.sol";
 using PriceConverter for uint256;
 
@@ -1398,10 +1404,7 @@ require(msg.value.getConversionRate(123) >= minimumUsd, "didn't send enough ETH"
 
 
 
-
-
-
-### TRUFFLE
+### TRUFFLE ️‍🔥
 
 
 #### INSTALLING TRUFFLE
@@ -1783,7 +1786,7 @@ truffle debug <TXHASH> --network ganache --fetch-external
 
 
 
-### HARDHAT
+### HARDHAT️‍🔥
 
 - **artifacts** folder in our root directory contains our smart contract abi array.
 - Hardhat comes built-in with Hardhat Network, a local Ethereum network designed for development.
@@ -2042,7 +2045,7 @@ npx hardhat ignition verify sepolia-deployment
 
 
 
-### FOUNDRY AND FORGE
+### FOUNDRY AND FORGE️‍🔥
 
 - Foundry totally depends on solidity and not on JS.
 
@@ -2162,7 +2165,7 @@ sepolia = { key = "${ETHERSCAN_API_KEY}" }
 - The tests in Foundry are written in Solidity.
 - We will use VM Cheatcodes.
 
-```solidity
+```js
 // test/Web3.t.sol
 
 ```
