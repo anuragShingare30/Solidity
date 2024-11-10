@@ -1234,6 +1234,170 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 
 
 
+### LIQUIDITY POOL (moneyjar -> smart contract)
+
+- A liquidity pool on the Ethereum blockchain is like a big **money jar** filled with two types of tokens (ETH AND ERC-20).
+- Here, people can trade directly with this jar, making it much faster and easier.
+- Anyone who wants to trade ETH for DAI (or DAI for ETH) can use this jar.
+
+
+#### Process followed when Pool is created and its Trading
+
+1. **Creating Pool(Uniswap)** : A **liquidity pool** is created by someone who puts both **ETH and ERC** into a digital jar **(smart contract)** on platform like Uniswap.
+2. **Trading** : Now, anyone who wants to trade ETH for DAI (or DAI for ETH) can use this smart contract(jar)
+3. **Swapping** : When someone swaps ETH for DAI, the pool takes in ETH and gives out DAI.
+4. **Pricing** : The prices adjust automatically based on how much ETH and DAI are in the jar.
+
+
+
+
+### NFT STAKING SMART CONTRACT (ERC-20 AND ERC-721)
+
+**In, NFT staking sc we will use both ERC20 and ERC721 token**
+
+- An NFT staking sc is a type of program on the blockchain that allows **NFT holders(ERC721)** to **stake(or lock up)** their NFTs **in the contract for a certain period of time.**
+- In exchange, they earn rewards, usually in the **form of tokens(ERC20)** or other benefits.
+- It’s a way for NFT owners to gain extra value from their NFTs without selling them.
+
+
+#### FLOW OF NFT STAKING SC
+
+- To understand the process flow we will consider some basic tokens and contract : 
+
+**Staking SmartContract(App)** : A contract with functions for staking, unstaking, and getting rewards (main function).
+**ERC-721(NFT)** : The NFT that users lock up for a set period when staking.
+**ERC-20(token)** : The reward token users earn when they unstake their NFTs.
+
+
+1. **STAKING** : NFT holders connect their wallets to the staking platform and select an NFT they want to stake.
+2. **Lock Period** : The NFT is locked and temporarily transferred to the smart contract for a specific time
+3. **Rewards** : For keeping their NFT staked, users earn rewards like tokens, points. 
+depending on the terms of the smart contract and company for which we are building
+4. **Unstaking** : When the lock period ends, users can withdraw their NFT and collect any rewards they earned.
+
+
+
+
+### L1, L2 AND ROLL-UPS IN ETHEREUM BLOCKCHAIN
+
+
+1. **Layer1 (Main Blockchain Layer)**  -> **(Bitcoin, Ethereum, and Solana)**
+
+- the foundational blockchain layer, the core network where transactions are processed directly.
+- They each have their own rules, consensus mechanisms, and security.
+
+- **Problem** Layer 1 blockchains can get slow and expensive when there's high demand of tsx
+
+
+2. **LAYER2 (Secondary Layer on Top of Layer1)**  -> **(Polygon, Arbitrum, and Optimism)**
+
+- Layer2 solutions are built on top of Layer1 blockchains.
+- handle transactions faster and more cheaply.
+- They offload some transactions from the main chain and then submit them in batches to Layer 1.
+
+- **BENEFITS** :  Layer 2 can offer faster processing and lower fees,
+
+
+
+3. **Rollups (Special Type of Layer 2 Solution)**  ->  **Arbitrum, zkSync**
+
+- Rollups bundle many transactions together, process them on Layer 2, and then send a single, compact summary back to Layer 1 for finalization.
+- This reduces the number of transactions Layer 1 has to handle directly.
+
+- **BENEFITS** : Rollups improve scalability even more than regular Layer2s by minimizing amount of data sent to the main chain.
+
+
+
+
+### ORACLE PROBLEMS / SMART CONTRACT CONNECTIVITY PROBLEM
+
+- The **Oracle problems** refers to the connectivity issue of smart contract with the off-chain resources(such as market-data, api_calls, api-data) with on-chain.
+
+
+- **Blockchain Oracles** is any device that interacts with the off-chain world to provide external data or computation to smart contract.
+- We will not use **centralized computation or centralized oracle/node** for our extrenal data.
+
+- **Chainlink is a decentralized Oracle Network**
+- When a smart contract combines on-chain and off-chain data, can be defined as **hybrid smart contract**
+
+
+**Now, how this blockchain oracles work** :
+- With the help of **decentralized oracle network**
+- On off-chain, chainlink nodes will store external data from data-providers.
+- On on-chain, the chainlink node will transfer the data to **Reference contract** so that other contract can used this data.
+
+- Here, we will use the **chaillink functions** to get the external data for our smart contract
+- And, this chainlink function will be the future of DeFi apps.
+
+2. **CHAINLINK VRF**
+3. **CHAINLINK AUTOMATION**
+4. **END-TO-END RELIABILITY(TAKE INPUT, RETURN OUTPUT)**
+
+
+
+### MATH CONVERSIONS IN SOLIDITY
+
+- Converting the value of ETH to USD
+- As prog. language it does not **support floating point number**
+
+```solidity
+function getConversionRate(uint256 ethAmount) public view returns (uint256) {
+    // getPrice() function will return current eth price in usd.
+    uint256 ethPrice = getPrice();
+    uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
+    return ethAmountInUsd;
+}
+```
+
+**NOTE** : In solidity,  multiply before dividing to get better precision.
+
+
+
+### CREATING OUR OWN libraries(optional)
+
+- When a functionality can be commonly used, we can create a **library** to efficiently manage repeated parts of codes.
+- Use keyword **library** instead of **contract**.
+
+```solidity
+// PriceConverter.sol 
+
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+
+library PriceConverter {
+    function getPrice() internal view returns (uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+        (int256 answer) = priceFeed.latestRoundData();
+        return uint256(answer * 10000000000);
+    }
+
+    function getConversionRate(uint256 ethAmount) internal view returns (uint256) {
+        uint256 ethPrice = getPrice();
+        uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1000000000000000000;
+        return ethAmountInUsd;
+    }
+}
+```
+
+- Now, to use the library in our solidity file, we have:
+- Here, **msg.value** is first-parameter and value in parenthesis is second-parameter.
+
+```solidity
+import {PriceConverter} from "./PriceConverter.sol";
+using PriceConverter for uint256;
+
+require(msg.value.getConversionRate(123) >= minimumUsd, "didn't send enough ETH");
+```
+
+
+### GAS OPTIMIZATION TECHNIQUE
+
+- Using keyword like **constant** and **immutable** can optimize the gas cost.
+
+**NOTE : constant and immutable keyword are used for gas optimization in smart contract**
+
+
+
+
 
 
 
@@ -1781,7 +1945,7 @@ contract TestContract {
 
 #### Deploying to a live network
 
-- To run the deploy our smart contract use following code:
+- To run  deploy our smart contract use following code:
 ```js
 // THIS INITITALIZE AN RPC SERVER
 npx hardhat node
@@ -1810,6 +1974,8 @@ const TokenModule = buildModule("TokenModule", (m) => {
 module.exports = TokenModule;
 ```
 
+
+
 - Now to deploy our smart contract we will initialize an RPC server locally in our terminal(port:8545)
 - We need to modify our **hardhat.config.js** file.
 
@@ -1824,14 +1990,14 @@ const { vars } = require("hardhat/config");
 
 
 const INFURA_API_KEY = vars.get("INFURA_API_KEY");
-const SEPOLIA_PRIVATE_KEY = vars.get("SEPOLIA_PRIVATE_KEY");
+const PRIVATE_KEY = vars.get("PRIVATE_KEY");
 
 module.exports = {
   solidity: "0.8.27",
   networks: {
     sepolia: {
       url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
-      accounts: [SEPOLIA_PRIVATE_KEY],
+      accounts: [PRIVATE_KEY],
     },
   },
   etherscan: {
@@ -1860,7 +2026,7 @@ npx hardhat vars set API_KEY_NAME
 // hardhat.config.cjs
 const { vars } = require("hardhat/config"); 
 const INFURA_API_KEY = vars.get("INFURA_API_KEY");
-const SEPOLIA_PRIVATE_KEY = vars.get("SEPOLIA_PRIVATE_KEY");
+const PRIVATE_KEY = vars.get("PRIVATE_KEY");
 ```
 
 
@@ -1876,158 +2042,127 @@ npx hardhat ignition verify sepolia-deployment
 
 
 
-### LIQUIDITY POOL (moneyjar -> smart contract)
+### FOUNDRY AND FORGE
 
-- A liquidity pool on the Ethereum blockchain is like a big **money jar** filled with two types of tokens (ETH AND ERC-20).
-- Here, people can trade directly with this jar, making it much faster and easier.
-- Anyone who wants to trade ETH for DAI (or DAI for ETH) can use this jar.
+- Foundry totally depends on solidity and not on JS.
 
+**Note : dependencies are added as git-submodules and not as npm or nodejs** 
 
-#### Process followed when Pool is created and its Trading
-
-1. **Creating Pool(Uniswap)** : A **liquidity pool** is created by someone who puts both **ETH and ERC** into a digital jar **(smart contract)** on platform like Uniswap.
-2. **Trading** : Now, anyone who wants to trade ETH for DAI (or DAI for ETH) can use this smart contract(jar)
-3. **Swapping** : When someone swaps ETH for DAI, the pool takes in ETH and gives out DAI.
-4. **Pricing** : The prices adjust automatically based on how much ETH and DAI are in the jar.
+- **src folder** : All our main smart contracts
+- **test folder** : All the test are written here.
+- **scripts folder** : To interact with smart contract we will write scripting file in soilidity
+- Project is configured using the **foundry.toml** file
 
 
+#### INSTALLATION
 
-
-### NFT STAKING SMART CONTRACT (ERC-20 AND ERC-721)
-
-**In, NFT staking sc we will use both ERC20 and ERC721 token**
-
-- An NFT staking sc is a type of program on the blockchain that allows **NFT holders(ERC721)** to **stake(or lock up)** their NFTs **in the contract for a certain period of time.**
-- In exchange, they earn rewards, usually in the **form of tokens(ERC20)** or other benefits.
-- It’s a way for NFT owners to gain extra value from their NFTs without selling them.
-
-
-#### FLOW OF NFT STAKING SC
-
-- To understand the process flow we will consider some basic tokens and contract : 
-
-**Staking SmartContract(App)** : A contract with functions for staking, unstaking, and getting rewards (main function).
-**ERC-721(NFT)** : The NFT that users lock up for a set period when staking.
-**ERC-20(token)** : The reward token users earn when they unstake their NFTs.
-
-
-1. **STAKING** : NFT holders connect their wallets to the staking platform and select an NFT they want to stake.
-2. **Lock Period** : The NFT is locked and temporarily transferred to the smart contract for a specific time
-3. **Rewards** : For keeping their NFT staked, users earn rewards like tokens, points. 
-depending on the terms of the smart contract and company for which we are building
-4. **Unstaking** : When the lock period ends, users can withdraw their NFT and collect any rewards they earned.
-
-
-
-
-### L1, L2 AND ROLL-UPS IN ETHEREUM BLOCKCHAIN
-
-
-1. **Layer1 (Main Blockchain Layer)**  -> **(Bitcoin, Ethereum, and Solana)**
-
-- the foundational blockchain layer, the core network where transactions are processed directly.
-- They each have their own rules, consensus mechanisms, and security.
-
-- **Problem** Layer 1 blockchains can get slow and expensive when there's high demand of tsx
-
-
-2. **LAYER2 (Secondary Layer on Top of Layer1)**  -> **(Polygon, Arbitrum, and Optimism)**
-
-- Layer2 solutions are built on top of Layer1 blockchains.
-- handle transactions faster and more cheaply.
-- They offload some transactions from the main chain and then submit them in batches to Layer 1.
-
-- **BENEFITS** :  Layer 2 can offer faster processing and lower fees,
-
-
-
-3. **Rollups (Special Type of Layer 2 Solution)**  ->  **Arbitrum, zkSync**
-
-- Rollups bundle many transactions together, process them on Layer 2, and then send a single, compact summary back to Layer 1 for finalization.
-- This reduces the number of transactions Layer 1 has to handle directly.
-
-- **BENEFITS** : Rollups improve scalability even more than regular Layer2s by minimizing amount of data sent to the main chain.
-
-
-
-### ORACLE PROBLEMS / SMART CONTRACT CONNECTIVITY PROBLEM
-
-- The **Oracle problems** refers to the connectivity issue of smart contract with the off-chain resources(such as market-data, api_calls, api-data) with on-chain.
-
-
-- **Blockchain Oracles** is any device that interacts with the off-chain world to provide external data or computation to smart contract.
-- We will not use **centralized computation or centralized oracle/node** for our extrenal data.
-
-- **Chainlink is a decentralized Oracle Network**
-- When a smart contract combines on-chain and off-chain data, can be defined as **hybrid smart contract**
-
-
-**Now, how this blockchain oracles work** :
-- With the help of **decentralized oracle network**
-- On off-chain, chainlink nodes will store external data from data-providers.
-- On on-chain, the chainlink node will transfer the data to **Reference contract** so that other contract can used this data.
-
-- Here, we will use the **chaillink functions** to get the external data for our smart contract
-- And, this chainlink function will be the future of DeFi apps.
-
-2. CHAINLINK VRF
-3. CHAINLINK AUTOMATION
-4. END-TO-END RELIABILITY(TAKE INPUT, RETURN OUTPUT)
-
-
-
-### MATH CONVERSIONS IN SOLIDITY
-
-- Converting the value of ETH to USD
-- As prog. language it does not **support floating point number**
-
-```solidity
-function getConversionRate(uint256 ethAmount) public view returns (uint256) {
-    // getPrice() function will return current eth price in usd.
-    uint256 ethPrice = getPrice();
-    uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
-    return ethAmountInUsd;
-}
+```js
+curl -L https://foundry.paradigm.xyz | bash
+source ~/.bashrc 
+foundryup
+forge init ProjectName
+forge install openzeppelin/openzeppelin-contracts
 ```
 
-**NOTE** : In solidity,  multiply before dividing to get better precision.
+**forge** : the build, test, debug, deploy smart contracts
+**anvil** :  the foundry equivalent of Ganache
+**cast** : low level access to smart contracts (a bit of a truffle console equivalent)
 
 
 
-### CREATING OUR OWN libraries(optional)
+#### DEPLOYING SC USING FOUNDRY
 
-- When a functionality can be commonly used, we can create a **library** to efficiently manage repeated parts of codes.
-- Use keyword **library** instead of **contract**.
+```js
+// using anvil
+anvil
+forge script script/Deploy.s.sol:MyScript --fork-url http://localhost:8545 --broadcast
+forge script script/Deploy.s.sol:MyScript --fork-url http://localhost:8545 --account <account_name> --sender <address> --broadcast
 
-```solidity
-// PriceConverter.sol 
 
-import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+// on testnet seolia
+forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --broadcast --verify -vvvv
+forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --account <account_name> --sender <address> --broadcast --verify -vvvv
+forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVATE_KEY --broadcast --verify -vvvv
+```
 
-library PriceConverter {
-    function getPrice() internal view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
-        (int256 answer) = priceFeed.latestRoundData();
-        return uint256(answer * 10000000000);
-    }
+##### STORE YOUR PRIVATE KEY IN KEYSTORE BY FOUNDRY
 
-    function getConversionRate(uint256 ethAmount) internal view returns (uint256) {
-        uint256 ethPrice = getPrice();
-        uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1000000000000000000;
-        return ethAmountInUsd;
+- Here, we will not store our private key in dotenv file. Rather, we will store it in **KeyStore** provided by foundry
+- Once we have stored it in keystore we can used it in any project.
+**Note** : This is useful when we need to submit our private key in an terminal.
+
+```js
+cast wallet import privateKey --interactive
+cast wallet list
+```
+
+##### DEPLOYING ON TESTNET AND ANVIL
+
+- deploy our Smart Contract using Foundry scripts.
+- We will write the deploy code in the **script** folder in solidity.
+
+```js
+// script/Deploy.s.sol
+
+import {Script} from "forge-std/Script.sol";
+import {TestContract} from "../src/Web3.sol";
+
+contract MyScript is Script{
+    
+    function run() external returns(TestContract){
+        // This loads in the private key from our .env file
+        uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
+
+        // a special cheatcode that records calls and contract creations made by our main script contract.
+        vm.startBroadcast(privateKey);
+        
+        // If we have constructor then passed the value in the function as params.
+        // CREATED A NEW CONTRACT INSTANCE.
+        TestContract token = new TestContract();
+        vm.stopBroadcast();
+        return token;
     }
 }
 ```
 
-- Now, to use the library in our solidity file, we have:
-- Here, **msg.value** is first-parameter and value in parenthesis is second-parameter.
+- change the **.env and foundry.toml file**
 
-```solidity
-import {PriceConverter} from "./PriceConverter.sol";
-using PriceConverter for uint256;
+```js
+// .env
+# SEPOLIA TESTNET
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/{INFURA_KEY}
+ETHERSCAN_API_KEY=
+PRIVATE_KEY=
 
-require(msg.value.getConversionRate(123) >= minimumUsd, "didn't send enough ETH");
+# ANVIL LOCALLY
+LOCALLY_RPC_URL=http://localhost:8545
+ANVIL_PRIVATE_KEY=
+```
+
+```js
+// foundry.toml
+fs_permissions = [{ access = "read", path = "./"}]
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
+
+[etherscan]
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
 ```
 
 
-**NOTE : constant and immutable keyword are used for gas optimization in smart contract**
+
+
+
+
+
+
+
+#### TESTING IN FOUNDRY
+
+- The tests in Foundry are written in Solidity.
+- We will use VM Cheatcodes.
+
+```solidity
+// test/Web3.t.sol
+
+```
