@@ -952,7 +952,7 @@ contract setData {
 
 - **On-chain storage** refers to the practice of storing data directly on the blockchain, leveraging its inherent security features but at the cost of speed and expense. 
 
-- **off-chain decentralized storage** involves storing data across a network of decentralized nodes or servers.
+- **off-chain decentralized storage** involves storing data across a network of decentralized nodes or servers.(IPFS)
 
 - **Off-chain private storage solutions** encompass traditional cloud-based and legacy data storage options designed for secure and controlled access.
 
@@ -1257,7 +1257,7 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 
 - An NFT staking sc is a type of program on the blockchain that allows **NFT holders(ERC721)** to **stake(or lock up)** their NFTs **in the contract for a certain period of time.**
 - In exchange, they earn rewards, usually in the **form of tokens(ERC20)** or other benefits.
-- It’s a way for NFT owners to gain extra value from their NFTs without selling them.
+- It's a way for NFT owners to gain extra value from their NFTs without selling them.
 
 
 #### FLOW OF NFT STAKING SC
@@ -1326,9 +1326,11 @@ depending on the terms of the smart contract and company for which we are buildi
 - On off-chain, chainlink nodes will store external data from data-providers.
 - On on-chain, the chainlink node will transfer the data to **Reference contract** so that other contract can used this data.
 
-- Here, we will use the **chaillink functions** to get the external data for our smart contract
+- Here, we will use the **chainlink functions** to get the external data for our smart contract
 - And, this chainlink function will be the future of DeFi apps.
 
+
+1. **CHAINLINK FUNCTIONS**
 2. **CHAINLINK VRF**
 3. **CHAINLINK AUTOMATION**
 4. **END-TO-END RELIABILITY(TAKE INPUT, RETURN OUTPUT)**
@@ -2045,11 +2047,11 @@ npx hardhat ignition verify sepolia-deployment
 
 
 
-### FOUNDRY AND FORGE️‍🔥
+### FOUNDRY AND FORGE️‍ 🔥
 
 - Foundry totally depends on solidity and not on JS.
 
-**Note : dependencies are added as git-submodules and not as npm or nodejs** 
+**Note : dependencies are added as git-submodules and not as npm or nodejs modules** 
 
 - **src folder** : All our main smart contracts
 - **test folder** : All the test are written here.
@@ -2059,7 +2061,7 @@ npx hardhat ignition verify sepolia-deployment
 
 #### INSTALLATION
 
-```js
+```solidity
 curl -L https://foundry.paradigm.xyz | bash
 source ~/.bashrc 
 foundryup
@@ -2073,9 +2075,10 @@ forge install openzeppelin/openzeppelin-contracts
 
 
 
+
 #### DEPLOYING SC USING FOUNDRY
 
-```js
+```solidity
 // using anvil
 anvil
 forge script script/Deploy.s.sol:MyScript --fork-url http://localhost:8545 --broadcast
@@ -2090,11 +2093,11 @@ forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --private-k
 
 ##### STORE YOUR PRIVATE KEY IN KEYSTORE BY FOUNDRY
 
-- Here, we will not store our private key in dotenv file. Rather, we will store it in **KeyStore** provided by foundry
+- Here, we will not store our private key in dotenv file. Rather, we will store it in **KeyStore** provided by foundry.
 - Once we have stored it in keystore we can used it in any project.
 **Note** : This is useful when we need to submit our private key in an terminal.
 
-```js
+```solidity
 cast wallet import privateKey --interactive
 cast wallet list
 ```
@@ -2104,7 +2107,7 @@ cast wallet list
 - deploy our Smart Contract using Foundry scripts.
 - We will write the deploy code in the **script** folder in solidity.
 
-```js
+```solidity
 // script/Deploy.s.sol
 
 import {Script} from "forge-std/Script.sol";
@@ -2154,18 +2157,92 @@ sepolia = { key = "${ETHERSCAN_API_KEY}" }
 
 
 
+#### INTERACTING WITH SC USING CAST
+
+- After deploying sc we can interact (send/call) the functions using **cast**
+
+```solidity
+cast send <address> "setName(string)" "anurag" --rpc-url <rpc_url> --private-key <private_key>
+cast call <address> "getName()"
+cast to-base 0x7717 dec
+```
 
 
+#### TO USE L2, ROLLUPS BLOCKCHAIN TECH. (EX: ZKSYNC)
 
+```js
+// to use vanilla-foundry
+foundryup
+
+// to use L2/ROLLUPS
+foundry-zksync
+```
+
+- For L2 and rollups you can refer there docs for more clearance
+- **--zksync** refers that we are running on L2/rollups blockchain
 
 
 
 #### TESTING IN FOUNDRY
 
 - The tests in Foundry are written in Solidity.
-- We will use VM Cheatcodes.
+- If the test function reverts, the test fails, otherwise it passes.
+- We will use **VM Cheatcodes.**
 
-```js
-// test/Web3.t.sol
+- Forge Standard Library -> forge-std
 
+1. **UNIT TESTING** - TESTING A SPECIFIC PART OF OUR CODE.
+2. **INTEGRATION TEST** - INTEGRATING SC A TESTING SPECIFIC PORTION.
+3. **FORKED TEST** - TESTING OUR CODE ON A SIMULATED REAL ENVIRONMENT.
+4. **STAGING TEST** - TESTING OUR CODE IN TESTNET/MAINNET. EX:- SEPOLIA, ANVIL LOCAL TESTING
+
+
+#### Forge Standard Library
+
+- **Vm.sol**: Up-to-date cheatcodes interface
+- **console.sol and console2.sol**: Hardhat-style logging functionality
+- **Script.sol**: Basic utilities for Solidity scripting
+- **Test.sol**: A superset of DSTest containing standard libraries, a cheatcodes instance (vm), and Hardhat console
+
+
+#### FOUNDRY CHEATCODES FOR TESTING
+
+1. **vm.prank(address(0))** - simulate a TNX to be sent from specific address.
+
+2. **vm.deal(address(this), 1 ether)** - Used to give the test contract Ether to work with.
+
+3. **vm.expectRevert(bytes("Niche ka functions pass nahi hore!!!"))** - Verifies that a specific error message is returned when a transaction fails.
+
+
+#### FORK TESTING
+
+- Forge supports testing in a forked environment
+- To run all tests in a forked environment, such as a forked Ethereum mainnet, pass an RPC URL via the --fork-url flag
+
+- Sometimes we need to run test from scratch. Before running test again remove the **cache directory**/**forge clean**
+
+
+```solidity
+// TO LOAD THE .env CONTENT
+source .env
+echo $RPC_URL
+
+// TESTING SC
+forge test -vvv
+forge test --fork-url $RPC_URL -vvvv
+
+// TO RUN THE SINGLE TEST
+forge test --mt testBalance -vvv --fork-url $RPC_URL
+
+// CONVERGING SC -> This command displays which parts of your code are covered by tests.
+forge converge --fork-url $RPC_URL   
+
+// DEBUGGING SC
+forge debug --debug src/Web3.sol:TestContract --sig "function(argu)" "arguValue"
+
+// Forge can remap dependencies to make them easier to import. Forge will automatically try to deduce some remappings for you:
+forge remappings
+
+// Forge supports identifying contracts in a forked environment with Etherscan.
+forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key>
 ```
