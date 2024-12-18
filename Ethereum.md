@@ -1,6 +1,50 @@
 # Solidity Programming Language Guide 😎
 
 
+### Software and Platform Used!!!
+
+**RPC Provider**
+1. Infura RPC provider
+2. Alchemy RPC Provider
+
+**Contracts**
+1. Openzeppllein
+2. Chainlink VRFv2.5
+3. Chainlink automationv2.1
+4. Alchemy contracts
+
+**wallets and Frameworks**
+1. Metamask
+2. Hardhat
+3. Foundry-forge
+4. Web3.js/ethers.js
+
+
+### Layout of smart contract to be followed
+
+**Layout of Contract:**
+// version
+// imports
+// errors
+// interfaces, libraries, contracts
+// Type declarations
+// State variables
+// Events
+// Modifiers
+// Functions
+
+**Layout of Functions:**
+// constructor
+// receive function (if exists)
+// fallback function (if exists)
+// external
+// public
+// internal
+// private
+// internal & private view & pure functions
+// external & public view & pure functions
+
+
 ### SIMPLE STRUCTURE FOR SOLIDITY SMART CONTRACT.
 
 - Here we will see the simple layout and structure to write the solidity smart contracts.
@@ -527,6 +571,25 @@ contract ErrorHandling {
 }
 
 ```
+
+
+### enum type in solidity
+
+- **enum** can have multiple values
+
+```solidity
+contract Enum {
+    enum Status{open, closed};
+
+    Status public s_status = Status.open;
+
+    function updateStatus() public {
+        s_status = Status.closed;
+    }
+}
+```
+
+
 
 
 ### LOW-LEVEL SOLIDITY CALLS (INTERACTING WITH TWO SMART CONTRACT).
@@ -1321,7 +1384,7 @@ depending on the terms of the smart contract and company for which we are buildi
 - When a smart contract combines on-chain and off-chain data, can be defined as **hybrid smart contract**
 
 
-**Now, how this blockchain oracles work** :
+**Now, how this blockchain oracles work**:
 - With the help of **decentralized oracle network**
 - On off-chain, chainlink nodes will store external data from data-providers.
 - On on-chain, the chainlink node will transfer the data to **Reference contract** so that other contract can used this data.
@@ -1402,6 +1465,43 @@ require(msg.value.getConversionRate(123) >= minimumUsd, "didn't send enough ETH"
 - Using keyword like **constant** and **immutable** can optimize the gas cost.
 
 **NOTE : constant and immutable keyword are used for gas optimization in smart contract**
+
+
+
+### MODULO OPERATOR
+
+- Modulo operator returns the remainder when a number is divided by a specific modulo.
+
+```solidity
+// modulo of 10
+function mod10(uint num) public pure  returns (uint){
+        return (num%10);
+
+
+}
+
+// modulo of 2
+function mod2(uint num) public pure  returns (uint){
+        return (num%2);
+}
+```
+
+
+
+### SENDING ETH FROM SMART CONTRACT TO SPECIFIC ADRRESS
+
+- Send the balance of smart contract to specific address
+
+```solidity
+function sendETH() public payable{
+    address userAddress = "0x001";
+    // sending ETH from smart contract to user
+    (bool success,)= userAddress.call{value: address(this).balance}("");
+    if(!success){
+        revert();
+    }
+}
+```
 
 
 
@@ -2047,9 +2147,11 @@ npx hardhat ignition verify sepolia-deployment
 
 
 
+
+
 ### FOUNDRY AND FORGE️‍ 🔥
 
-- Foundry totally depends on solidity and not on JS.
+- Foundry totally written on solidity and not on JS.
 
 **Note : dependencies are added as git-submodules and not as npm or nodejs modules** 
 
@@ -2057,7 +2159,9 @@ npx hardhat ignition verify sepolia-deployment
 - **test folder** : All the test are written here.
 - **scripts folder** : To interact with smart contract we will write scripting file in soilidity
 - Project is configured using the **foundry.toml** file
+- **lib folder** : Dependencies are stored as git-submodules in lib/
 
+- After compiling/deploying the smart contract **abi array will be in out/ folder in contract name file**
 
 #### INSTALLATION
 
@@ -2073,6 +2177,12 @@ forge install openzeppelin/openzeppelin-contracts
 **anvil** :  the foundry equivalent of Ganache
 **cast** : low level access to smart contracts (a bit of a truffle console equivalent)
 
+
+#### Compile smart contract
+
+```solidity
+forge build
+```
 
 
 
@@ -2188,6 +2298,7 @@ foundry-zksync
 - The tests in Foundry are written in Solidity.
 - If the test function reverts, the test fails, otherwise it passes.
 - We will use **VM Cheatcodes.**
+- contract name starting with **test** are considered as a good practice in foundry
 
 - Forge Standard Library -> forge-std
 
@@ -2240,9 +2351,24 @@ forge converge --fork-url $RPC_URL
 // DEBUGGING SC
 forge debug --debug src/Web3.sol:TestContract --sig "function(argu)" "arguValue"
 
-// Forge can remap dependencies to make them easier to import. Forge will automatically try to deduce some remappings for you:
-forge remappings
 
 // Forge supports identifying contracts in a forked environment with Etherscan.
 forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key>
 ```
+
+
+#### Remapping dependencies
+
+- Before running the forge remapping command we need to store the path in **toml**
+
+```js
+remapping = ['@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts']
+```
+
+- **@chainlink/contracts** now is equal to the actual path of contract
+
+```solidity
+// Forge can remap dependencies to make them easier to import. Forge will automatically try to deduce some remappings for you:
+forge remappings
+```
+
