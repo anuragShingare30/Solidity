@@ -1372,12 +1372,14 @@ depending on the terms of the smart contract and company for which we are buildi
 
 
 
+
 ### ORACLE PROBLEMS / SMART CONTRACT CONNECTIVITY PROBLEM
 
-- The **Oracle problems** refers to the connectivity issue of smart contract with the off-chain resources(such as market-data, api_calls, api-data) with on-chain.
+- The **Oracle problems** refers to the connectivity issue of smart contract with the off-chain data(such as market-data, api_calls, api-data) with on-chain data.
 
 
-- **Blockchain Oracles** is any device that interacts with the off-chain world to provide external data or computation to smart contract.
+- **Blockchain Oracles** is any device that interacts with the off-chain world to provide external data or computation on on-chain.
+- **Blockchain oracle** is a secure piece of middleware that facilitates communication between blockchains and any off-chain system, including data providers, web APIs, enterprise backends, cloud providers, IoT devices, e-signatures, payment systems.
 - We will not use **centralized computation or centralized oracle/node** for our extrenal data.
 
 - **Chainlink is a decentralized Oracle Network**
@@ -1397,6 +1399,7 @@ depending on the terms of the smart contract and company for which we are buildi
 2. **CHAINLINK VRF**
 3. **CHAINLINK AUTOMATION**
 4. **END-TO-END RELIABILITY(TAKE INPUT, RETURN OUTPUT)**
+
 
 
 
@@ -2184,11 +2187,36 @@ forge install openzeppelin/openzeppelin-contracts
 forge build
 ```
 
+#### .env and foundry.toml file
+
+```solidity
+// .env
+SEPOLIA_RPC_URL=
+PRIVATE_KEY=
+ETHERSCAN_API_KEY=
+
+
+// foundry.toml
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
+
+[etherscan]
+sepolia = { key = "${ETHERSCAN_API_KEY}"}
+
+
+// This loads in the private key from our .env file
+uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
+```
+
 
 
 #### DEPLOYING SC USING FOUNDRY
 
 ```solidity
+// Scripting with Arguments(Passing params from command line)
+forge script --chain sepolia script/Deploy.s.sol:MyScript "NFT tutorial" TUT baseUri --sig 'run(string,string,string)' --rpc-url $SEPOLIA_RPC_URL --broadcast --verify -vvvv
+
+
 // using anvil
 anvil
 forge script script/Deploy.s.sol:MyScript --fork-url http://localhost:8545 --broadcast
@@ -2225,21 +2253,143 @@ import {TestContract} from "../src/Web3.sol";
 
 contract MyScript is Script{
     
+    // BY DEFAULT forge script EXECUTES THE 'run' FUNCTION DURING DEPLOYMENT
     function run() external returns(TestContract){
         // This loads in the private key from our .env file
         uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
 
-        // a special cheatcode that records calls and contract creations made by our main script contract.
+        // contract creations made by our main script contract.
+        // private key is passed to instruct to use that key for signing the transactions. 
         vm.startBroadcast(privateKey);
         
         // If we have constructor then passed the value in the function as params.
         // CREATED A NEW CONTRACT INSTANCE.
-        TestContract token = new TestContract();
+        TestContract token = new TestContract("Token Name","ETH", "base_URL");
+
         vm.stopBroadcast();
         return token;
     }
 }
 ```
+
+##### Scripting with Arguments
+
+```solidity
+// run following command to deploy our script with params
+forge script --chain sepolia script/Deploy.s.sol:MyScript "NFT tutorial" TUT baseUri --sig 'run(string,string,string)' --rpc-url $SEPOLIA_RPC_URL --broadcast --verify -vvvv
+
+
+contract MyScript is Script {
+    function run(
+        string calldata _name,
+        string calldata _symbol,
+        string calldata _baseUri
+    ) external {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        NFT nft = new NFT(_name, _symbol, _baseUri);
+
+        vm.stopBroadcast();
+    }
+}
+```
+
+
+#### SCRIPTING CONTRACT AND HELPER CONFIG FILE
+
+- We will declare **HelperConfig.s.sol** file to declare some common and important variables and functions which can be used by importing.
+
+**HelperConfig.s.sol**
+```solidity
+contract HelperConfig is Script{
+    // ERROR
+    error HelperConfig__InvalidChainId();
+
+    // TYPES (pass all the constructor params here)
+    struct NetworkConfig {
+        uint priceFeed;
+    }
+
+    // STATE VARIABLES
+    // Local network state variables
+    NetworkConfig public localNetworkConfig;
+    mapping(uint256 chainId => NetworkConfig) public networkConfigs;
+
+    // FUNCTIONS
+    constructor(){
+        networkConfigs[ETH_SEPOLIA_CHAIN_ID] = getSepoliaETHConfig();
+        networkConfigs[ZKSYNC_SEPOLIA_CHAIN_ID] = getL2ChainConfig();
+        networkConfigs[LOCAL_CHAIN_ID] = getAnvilETHConfig();
+    }
+
+    function getConfigByChainId(uint256 chainId) public view returns(NetworkConfig memory){
+        if(networkConfigs[chainId].VRFCoordinator != address(0)){
+            return networkConfigs[chainId];
+        } else if(chainId == LOCAL_CHAIN_ID){
+            return networkConfigs[chainId];
+        }else{
+            revert HelperConfig__InvalidChainId();
+        }
+    }
+
+    // CONFIGS FOR SEPOLIA AND L2 CHAINS
+    function getSepoliaETHConfig() public pure returns(NetworkConfig memory){
+        return NetworkConfig({priceFeed:200});
+    }
+
+    function getL2ChainConfig() public view returns(NetworkConfig memory){
+        return NetworkConfig({priceFeed:200});
+    }
+
+    // LOCAL CONFIG (Local testing using a Mock contract)
+    // Here, we will write the mock script smart contract on local network  
+    function getAnvilETHConfig() public returns(NetworkConfig memory){
+        // Check to see if we set an active network config
+        if(localNetworkConfig.VRFCoordinator != address(0)){
+            return localNetworkConfig;
+        }
+
+        // DEPLOY MOCK SMART CONTRACT
+        vm.startBroadcast();
+        VRFCoordinatorV2_5Mock mockVRFcontract = new VRFCoordinatorV2_5Mock(MOCK_BASEPRICE);
+        vm.stopBroadcast();
+
+        localNetworkConfig = NetworkConfig({priceFeed:200});
+        return localNetworkConfig;
+    }
+
+}
+```
+
+
+**Deploy.s.sol**
+```solidity
+import {Contract};
+import {HelperConfig};
+
+contract MyScript is Script {
+
+    function setUp() public returns (Contract, HelperConfig){
+        // CREATED NEW HELPERNETWORK CONFIG INSTANCE
+        HelperConfig helperConfig = new HelperConfig();
+
+        vm.startBroadcast();
+        Contract token = new Contract(pass_constructor_params);
+        vm.stopBroadcast();
+
+        return {token,helperConfig};
+    }
+
+    // BY DEFAULT forge script EXECUTES THE 'run' FUNCTION DURING DEPLOYMENT
+    function run() external returns(Contract,HelperConfig) {
+        return setUp();
+    }
+}
+```
+
+
+
 
 - change the **.env and foundry.toml file**
 
@@ -2308,24 +2458,7 @@ foundry-zksync
 4. **STAGING TEST** - TESTING OUR CODE IN TESTNET/MAINNET. EX:- SEPOLIA, ANVIL LOCAL TESTING
 
 
-#### Forge Standard Library
-
-- **Vm.sol**: Up-to-date cheatcodes interface
-- **console.sol and console2.sol**: Hardhat-style logging functionality
-- **Script.sol**: Basic utilities for Solidity scripting
-- **Test.sol**: A superset of DSTest containing standard libraries, a cheatcodes instance (vm), and Hardhat console
-
-
-#### FOUNDRY CHEATCODES FOR TESTING
-
-1. **vm.prank(address(0))** - simulate a TNX to be sent from specific address.
-
-2. **vm.deal(address(this), 1 ether)** - Used to give the test contract Ether to work with.
-
-3. **vm.expectRevert(bytes("Niche ka functions pass nahi hore!!!"))** - Verifies that a specific error message is returned when a transaction fails.
-
-
-#### FORK TESTING
+#### FORK TESTING/UNIT TESTING
 
 - Forge supports testing in a forked environment
 - To run all tests in a forked environment, such as a forked Ethereum mainnet, pass an RPC URL via the --fork-url flag
@@ -2355,6 +2488,108 @@ forge debug --debug src/Web3.sol:TestContract --sig "function(argu)" "arguValue"
 // Forge supports identifying contracts in a forked environment with Etherscan.
 forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key>
 ```
+
+
+
+
+#### Forge Standard Library
+
+- **Vm.sol**: Up-to-date cheatcodes interface
+- **console.sol and console2.sol**: Hardhat-style logging functionality
+- **Script.sol**: Basic utilities for Solidity scripting
+- **Test.sol**: A superset of DSTest containing standard libraries, a cheatcodes instance (vm), and Hardhat console
+
+
+
+##### WRITING THE UNIT/FORK TEST
+
+```solidity
+import {Test} from "forge-std/Test.sol";
+import {stdError} from "forge-std/StdError.sol";
+
+error Unauthorized();
+
+// MAIN CONTRACT
+contract OwnerUpOnly {
+    address public immutable owner;
+    uint256 public count;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function increment() external {
+        if (msg.sender != owner) {
+            revert Unauthorized();
+        }
+        count++;
+    }
+}
+
+// test/ContractTest.t.sol
+contract OwnerUpOnlyTest is Test {
+    // NEW CONTRACT INSTANCE
+    OwnerUpOnly upOnly;
+    // DEFAULT FUNCTION
+    function setUp() public {
+        upOnly = new OwnerUpOnly();
+    }
+    // TEST FUNCTION
+    function test_IncrementAsOwner() public {
+        assertEq(upOnly.count(), 0);
+        upOnly.increment();
+        assertEq(upOnly.count(), 1);
+    }
+}
+```
+
+#### Some best practices to followed when writing the tests :
+
+1. **vm.prank(address(0))** - simulate a TNX to be sent from specific address.
+
+2. **vm.deal(address(this), 1 ether)** - Used to give the test contract Ether to work with.
+
+3. **vm.expectRevert(bytes("Niche ka functions pass nahi hore!!!"))** - Verifies that a specific error message is returned when a transaction fails.
+
+4. **test_FunctionName**: Functions prefixed with 'test' are run as a test case by forge.
+
+5. **For, testFail** : A good practice is to use the pattern **test_Revert[If|When]_Condition** in combination with the **expectRevert** cheatcode 
+
+```solidity
+function test_RevertCannotSubtract43() public {
+    vm.expectRevert(stdError.arithmeticError);
+    testNumber -= 43;
+}
+```
+
+6. Test functions must have either **external or public** visibility.
+
+
+
+##### SHARED SETUPS
+
+- Use the **HelperConfig.sol and HelperContract.sol** files to extract some important variables and functions.
+
+```solidity
+abstract contract HelperContract {
+    // HERE, WE WILL DECLARED SOME IMP. AND COMMON VARIABLES AND FUNCTIONS
+    address constant IMPORTANT_ADDRESS = 0x543d...;
+    SomeContract someContract;
+    constructor() {...}
+}
+
+contract MyContractTest is Test, HelperContract {
+    // INHERIT THE HELPER CONTRACT TO USE COMMON VARIABLE AND FUNCTIONS
+    function setUp() public {
+        someContract = new SomeContract(0, IMPORTANT_ADDRESS);
+        ...
+    }
+}
+```
+
+
+
+
 
 
 #### Remapping dependencies
