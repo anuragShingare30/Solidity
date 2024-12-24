@@ -1506,6 +1506,17 @@ function sendETH() public payable{
 }
 ```
 
+### TECHNIQUE TO CONVERT THE ETH INTO WEI
+
+```solidity
+1 Ether = 1e18 wei;
+1 Ether = 1e9 wei;
+
+uint256 public constant SEND_VALUE = 1e18;
+uint256 public constant SEND_VALUE = 1_000_000_000_000_000_000;
+uint256 public constant SEND_VALUE = 1000000000000000000;
+```
+
 
 
 
@@ -2210,10 +2221,21 @@ uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
 
 
 
+#### SOLIDITY SCRIPTING
+
+- Written in solidity
+- they are run on the fast Foundry EVM backend, **which provides dry-run capabilities.**
+- **By default, scripts are executed by calling the function named run, our entrypoint.**
+
+- Pass all the constructor params in contract instance.
+
+
+
+
 #### DEPLOYING SC USING FOUNDRY
 
 ```solidity
-// Scripting with Arguments(Passing params from command line)
+// Scripting with Arguments(Passing params from command line) OPTIONAL
 forge script --chain sepolia script/Deploy.s.sol:MyScript "NFT tutorial" TUT baseUri --sig 'run(string,string,string)' --rpc-url $SEPOLIA_RPC_URL --broadcast --verify -vvvv
 
 
@@ -2223,11 +2245,13 @@ forge script script/Deploy.s.sol:MyScript --fork-url http://localhost:8545 --bro
 forge script script/Deploy.s.sol:MyScript --fork-url http://localhost:8545 --account <account_name> --sender <address> --broadcast
 
 
-// on testnet seolia
+// on testnet sepolia
 forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --broadcast --verify -vvvv
 forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --account <account_name> --sender <address> --broadcast --verify -vvvv
 forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVATE_KEY --broadcast --verify -vvvv
 ```
+
+
 
 ##### STORE YOUR PRIVATE KEY IN KEYSTORE BY FOUNDRY
 
@@ -2240,10 +2264,15 @@ cast wallet import privateKey --interactive
 cast wallet list
 ```
 
+
+
+
 ##### DEPLOYING ON TESTNET AND ANVIL
 
 - deploy our Smart Contract using Foundry scripts.
 - We will write the deploy code in the **script** folder in solidity.
+
+**By default, scripts are executed by calling the function named run, our entrypoint.**
 
 ```solidity
 // script/Deploy.s.sol
@@ -2362,6 +2391,7 @@ contract HelperConfig is Script{
 }
 ```
 
+**By default, scripts are executed by calling the function named run, our entrypoint.**
 
 **Deploy.s.sol**
 ```solidity
@@ -2391,7 +2421,7 @@ contract MyScript is Script {
 
 
 
-- change the **.env and foundry.toml file**
+**change the .env and foundry.toml file**
 
 ```js
 // .env
@@ -2443,6 +2473,9 @@ foundry-zksync
 
 
 
+
+
+
 #### TESTING IN FOUNDRY
 
 - The tests in Foundry are written in Solidity.
@@ -2473,9 +2506,11 @@ echo $RPC_URL
 
 // TESTING SC
 forge test -vvv
+
 forge test --fork-url $RPC_URL -vvvv
 
 // TO RUN THE SINGLE TEST
+forge test --mt testFunctionName
 forge test --mt testBalance -vvv --fork-url $RPC_URL
 
 // CONVERGING SC -> This command displays which parts of your code are covered by tests.
@@ -2530,6 +2565,7 @@ contract OwnerUpOnly {
 contract OwnerUpOnlyTest is Test {
     // NEW CONTRACT INSTANCE
     OwnerUpOnly upOnly;
+    
     // DEFAULT FUNCTION
     function setUp() public {
         upOnly = new OwnerUpOnly();
@@ -2545,15 +2581,19 @@ contract OwnerUpOnlyTest is Test {
 
 #### Some best practices to followed when writing the tests :
 
-1. **vm.prank(address(0))** - simulate a TNX to be sent from specific address.
+1. **vm.prank(address(0))** - simulate a TNX to be sent from given specific address.
 
 2. **vm.deal(address(this), 1 ether)** - Used to give the test contract Ether to work with.
 
-3. **vm.expectRevert(bytes("Niche ka functions pass nahi hore!!!"))** - Verifies that a specific error message is returned when a transaction fails.
+3. **vm.expectRevert()**: 
+- Agar mera call/send function revert ho gaya, Toh mera test pass ho jayega.
+- Else, test fail ho jayega.
 
-4. **test_FunctionName**: Functions prefixed with 'test' are run as a test case by forge.
+4. **vm.expectRevert(CustomError.selector)**  :  import the error from contract with 'selector' 
 
-5. **For, testFail** : A good practice is to use the pattern **test_Revert[If|When]_Condition** in combination with the **expectRevert** cheatcode 
+5. **test_FunctionName**: Functions prefixed with 'test' are run as a test case by forge.
+
+6. **For, testFail** : A good practice is to use the pattern **test_Revert[If|When]_Condition** in combination with the **expectRevert** cheatcode 
 
 ```solidity
 function test_RevertCannotSubtract43() public {
