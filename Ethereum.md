@@ -2629,9 +2629,6 @@ contract MyContractTest is Test, HelperContract {
 
 
 
-
-
-
 #### Remapping dependencies
 
 - Before running the forge remapping command we need to store the path in **toml**
@@ -2646,4 +2643,133 @@ remapping = ['@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts']
 // Forge can remap dependencies to make them easier to import. Forge will automatically try to deduce some remappings for you:
 forge remappings
 ```
+
+
+
+
+
+### FOUNDRY-DEVOPS
+
+# foundry-devops
+
+A repo to get the most recent deployment from a given environment in foundry. This way, you can do scripting off previous deployments in solidity.
+
+It will look through your `broadcast` folder at your most recent deployment.
+
+## Features
+- Get the most recent deployment of a contract in foundry
+- Checking if you're on a zkSync based chain
+
+
+# Getting Started
+
+
+## Installation
+
+- Update forge-std to use newer FS cheatcodes
+
+```bash
+forge install Cyfrin/foundry-devops --no-commit
+
+forge install foundry-rs/forge-std@v1.8.2 --no-commit
+```
+
+
+#### Usage - Getting the most recent deployment
+
+
+**1. Update your `foundry.toml` to have read permissions on the `broadcast` folder.**
+
+```solidity
+fs_permissions = [
+    { access = "read", path = "./broadcast" },
+    { access = "read", path = "./reports" },
+]
+```
+
+2. **Import the package, and call `DevOpsTools.get_most_recent_deployment("MyContract", chainid);`**
+
+ie:
+
+```solidity
+import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
+import {MyContract} from "my-contract/MyContract.sol";
+.
+.
+.
+function interactWithPreviouslyDeployedContracts() public {
+    address contractAddress = DevOpsTools.get_most_recent_deployment("MyContract", block.chainid);
+    MyContract myContract = MyContract(contractAddress);
+    myContract.doSomething();
+}
+```
+
+
+## Usage - zkSync Checker
+
+### Prerequisites
+- [foundry-zksync](https://github.com/matter-labs/foundry-zksync)
+  - You'll know you did it right if you can run `foundryup-zksync --help` and you see a response like:
+```
+The installer for Foundry-zksync.
+
+Update or revert to a specific Foundry-zksync version with ease.
+.
+.
+.
+```
+
+### Usage - ZkSyncChainChecker
+
+In your contract, you can import and inherit the abstract contract `ZkSyncChainChecker` to check if you are on a zkSync based chain. And add the `skipZkSync` modifier to any function you want to skip if you are on a zkSync based chain.
+
+It will check both the precompiles or the `chainid` to determine if you are on a zkSync based chain.
+
+```javascript
+import {ZkSyncChainChecker} from "lib/foundry-devops/src/ZkSyncChainChecker.sol";
+
+contract MyContract is ZkSyncChainChecker {
+
+  function doStuff() skipZkSync {
+```
+
+### ZkSyncChainChecker modifiers:
+- `skipZkSync`: Skips the function if you are on a zkSync based chain.
+- `onlyZkSync`: Only allows the function if you are on a zkSync based chain.
+  
+
+
+### ZkSyncChainChecker Functions:
+- `isZkSyncChain()`: Returns true if you are on a zkSync based chain.
+- `isOnZkSyncPrecompiles()`: Returns true if you are on a zkSync based chain using the precompiles.
+- `isOnZkSyncChainId()`: Returns true if you are on a zkSync based chain using the chainid.
+
+### Usage - FoundryZkSyncChecker
+
+In your contract, you can import and inherit the abstract contract `FoundryZkSyncChecker` to check if you are on the `foundry-zksync` fork of `foundry`. 
+
+> !Important: Functions and modifiers in `FoundryZkSyncChecker` are only available if you run `foundry-zksync` with the `--zksync` flag.
+
+```javascript
+import {FoundryZkSyncChecker} from "lib/foundry-devops/src/FoundryZkSyncChecker.sol";
+
+contract MyContract is FoundryZkSyncChecker {
+
+  function doStuff() onlyFoundryZkSync {
+```
+
+You must also add `ffi = true` to your `foundry.toml` to use this feature. 
+
+### FoundryZkSync modifiers:
+- `onlyFoundryZkSync`: Only allows the function if you are on `foundry-zksync`
+- `onlyVanillaFoundry`: Only allows the function if you are on `foundry`
+
+### FoundryZkSync Functions:
+- `is_foundry_zksync`: Returns true if you are on `foundry-zksync`
+
+
+
+
+# Limitations
+- You cannot deploy a contract with `FoundryZkSyncChainChecker` or `ZkSyncChainChecker` because `foundry-zksync` gets confused by a lot of cheatcodes, and doesn't recognize cheatcodes after compiling to the EraVM. 
 
