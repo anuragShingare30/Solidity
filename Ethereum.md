@@ -20,7 +20,21 @@
 4. Web3.js/ethers.js
 
 
-### Layout of smart contract to be followed
+### Best Practices of smart contract to be followed
+
+**Natspec format**
+
+```solidity
+/// @title A simulator for trees
+/// @author Larry A. Gardner
+/// @notice You can use this contract for only the most basic simulation
+/// @dev All function calls are currently implemented without side effects
+/// @return Returning variable of function
+/// @param  A Parameters used in function
+```
+
+
+
 
 **Layout of Contract:**
 // version
@@ -2180,9 +2194,11 @@ npx hardhat ignition verify sepolia-deployment
 #### INSTALLATION
 
 ```solidity
+// only once
 curl -L https://foundry.paradigm.xyz | bash
 source ~/.bashrc 
 foundryup
+// to initialize project
 forge init ProjectName
 forge install openzeppelin/openzeppelin-contracts
 ```
@@ -2225,14 +2241,14 @@ uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
 
 - Written in solidity
 - they are run on the fast Foundry EVM backend, **which provides dry-run capabilities.**
-- **By default, scripts are executed by calling the function named run, our entrypoint.**
+- **By default, scripts are executed by calling the function named `run`, our entrypoint.**
 
 - Pass all the constructor params in contract instance.
+- **We will use `HelperConfig.s.sol and Intraction.s.sol` file in our `Deploy.s.sol`**
 
 
 
-
-#### DEPLOYING SC USING FOUNDRY
+#### DEPLOYING SMART CONTRACT (COMMMANDS)
 
 ```solidity
 // Scripting with Arguments(Passing params from command line) OPTIONAL
@@ -2253,7 +2269,7 @@ forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --private-k
 
 
 
-##### STORE YOUR PRIVATE KEY IN KEYSTORE BY FOUNDRY
+##### STORE YOUR PRIVATE KEY IN KEYSTORE (CAST)
 
 - Here, we will not store our private key in dotenv file. Rather, we will store it in **KeyStore** provided by foundry.
 - Once we have stored it in keystore we can used it in any project.
@@ -2267,7 +2283,7 @@ cast wallet list
 
 
 
-##### DEPLOYING ON TESTNET AND ANVIL
+##### DEPLOYING ON TESTNET, ANVIL and ROLLUPS BLOCKCHAIN
 
 - deploy our Smart Contract using Foundry scripts.
 - We will write the deploy code in the **script** folder in solidity.
@@ -2275,6 +2291,7 @@ cast wallet list
 **By default, scripts are executed by calling the function named run, our entrypoint.**
 
 ```solidity
+// Just a 
 // script/Deploy.s.sol
 
 import {Script} from "forge-std/Script.sol";
@@ -2283,7 +2300,7 @@ import {TestContract} from "../src/Web3.sol";
 contract MyScript is Script{
     
     // BY DEFAULT forge script EXECUTES THE 'run' FUNCTION DURING DEPLOYMENT
-    function run() external returns(TestContract){
+    function setUp() external returns(TestContract){
         // This loads in the private key from our .env file
         uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
 
@@ -2298,36 +2315,20 @@ contract MyScript is Script{
         vm.stopBroadcast();
         return token;
     }
-}
-```
 
-##### Scripting with Arguments
-
-```solidity
-// run following command to deploy our script with params
-forge script --chain sepolia script/Deploy.s.sol:MyScript "NFT tutorial" TUT baseUri --sig 'run(string,string,string)' --rpc-url $SEPOLIA_RPC_URL --broadcast --verify -vvvv
-
-
-contract MyScript is Script {
-    function run(
-        string calldata _name,
-        string calldata _symbol,
-        string calldata _baseUri
-    ) external {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        vm.startBroadcast(deployerPrivateKey);
-
-        NFT nft = new NFT(_name, _symbol, _baseUri);
-
-        vm.stopBroadcast();
+    function run() external returns(TestContract){
+        return setUp();
     }
 }
 ```
 
 
+
 #### SCRIPTING CONTRACT AND HELPER CONFIG FILE
 
-- We will declare **HelperConfig.s.sol** file to declare some common and important variables and functions which can be used by importing.
+- We will declare **`HelperConfig.s.sol`** file to declare some common and important variables and functions which can be used by importing.
+
+
 
 **HelperConfig.s.sol**
 ```solidity
@@ -2350,6 +2351,10 @@ contract HelperConfig is Script{
         networkConfigs[ETH_SEPOLIA_CHAIN_ID] = getSepoliaETHConfig();
         networkConfigs[ZKSYNC_SEPOLIA_CHAIN_ID] = getL2ChainConfig();
         networkConfigs[LOCAL_CHAIN_ID] = getAnvilETHConfig();
+    }
+
+    function getConfig() public view returns(NetworkConfig memory){
+        return getConfigByChainId(block.chainid);
     }
 
     function getConfigByChainId(uint256 chainId) public view returns(NetworkConfig memory){
@@ -2392,6 +2397,8 @@ contract HelperConfig is Script{
 ```
 
 **By default, scripts are executed by calling the function named run, our entrypoint.**
+- This is the `pattern and best practice` we should followed!!!
+
 
 **Deploy.s.sol**
 ```solidity
@@ -2403,9 +2410,14 @@ contract MyScript is Script {
     function setUp() public returns (Contract, HelperConfig){
         // CREATED NEW HELPERNETWORK CONFIG INSTANCE
         HelperConfig helperConfig = new HelperConfig();
+        HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
 
         vm.startBroadcast();
-        Contract token = new Contract(pass_constructor_params);
+        // pass all the constructor params here...
+        Contract token = new Contract(
+            config.priceFedd,
+            config.DataFeed,
+        );
         vm.stopBroadcast();
 
         return {token,helperConfig};
@@ -2491,7 +2503,7 @@ foundry-zksync
 4. **STAGING TEST** - TESTING OUR CODE IN TESTNET/MAINNET. EX:- SEPOLIA, ANVIL LOCAL TESTING
 
 
-#### FORK TESTING/UNIT TESTING
+#### FORK TESTING/UNIT TESTING (COMMANDS)
 
 - Forge supports testing in a forked environment
 - To run all tests in a forked environment, such as a forked Ethereum mainnet, pass an RPC URL via the --fork-url flag
@@ -2533,6 +2545,65 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 - **console.sol and console2.sol**: Hardhat-style logging functionality
 - **Script.sol**: Basic utilities for Solidity scripting
 - **Test.sol**: A superset of DSTest containing standard libraries, a cheatcodes instance (vm), and Hardhat console
+
+
+
+
+#### Some best practices to followed when writing the tests :
+
+1. **vm.prank(address(0))** - simulate a TNX to be sent from given specific address.
+
+2. **vm.deal(address(this), 1 ether)** - Used to give the test contract Ether to work with.
+
+3. **vm.expectRevert()**: 
+- Agar mera call/send function revert ho gaya, Toh mera test pass ho jayega.
+- Else, test fail ho jayega.
+
+4. **vm.expectRevert(Contract.CustomError.selector)**  :  import the error from contract with 'selector' 
+
+- **vm.expectRevert(abi.enocodeSelector(Contract.CustomError.selector, params1, params2));**
+
+5. **test_FunctionName**: Functions prefixed with 'test' are run as a test case by forge.
+
+6. **For, testFail** : A good practice is to use the pattern **test_Revert[If|When]_Condition** in combination with the **expectRevert** cheatcode 
+
+```solidity
+function test_RevertCannotSubtract43() public {
+    vm.expectRevert(stdError.arithmeticError);
+    testNumber -= 43;
+}
+```
+
+7. **Test functions must have either **external or public** visibility.**
+
+
+8. **type aliases(enum, struct, array,errors,events) can be call using main contract(Lottery) only.**
+
+9. **functions(call/send) can be called by our instance(lottery)**
+
+
+10. **To Transfer some value during calling or Transact eth to SC**
+
+```solidity
+function test_LotteryCheckIfUserIsAdded() external {
+    vm.prank(USER);
+    // by this method we pass some eth to our user.
+    lottery.enterLottery{value:_entranceFee}();
+    }
+```
+
+
+11. **vm.expectEmit()** : a specific log is emitted during the next call.
+
+```solidity
+function test_LotteryEntranceFeeEvents() external{
+    vm.prank(USER);
+    // for indexed params we will set it true 
+    vm.expectEmit(true, false, false,false , address(lottery));
+    emit EnteredUser(USER);
+    lottery.enterLottery{value:_entranceFee}();
+}
+```
 
 
 
@@ -2579,34 +2650,9 @@ contract OwnerUpOnlyTest is Test {
 }
 ```
 
-#### Some best practices to followed when writing the tests :
-
-1. **vm.prank(address(0))** - simulate a TNX to be sent from given specific address.
-
-2. **vm.deal(address(this), 1 ether)** - Used to give the test contract Ether to work with.
-
-3. **vm.expectRevert()**: 
-- Agar mera call/send function revert ho gaya, Toh mera test pass ho jayega.
-- Else, test fail ho jayega.
-
-4. **vm.expectRevert(CustomError.selector)**  :  import the error from contract with 'selector' 
-
-5. **test_FunctionName**: Functions prefixed with 'test' are run as a test case by forge.
-
-6. **For, testFail** : A good practice is to use the pattern **test_Revert[If|When]_Condition** in combination with the **expectRevert** cheatcode 
-
-```solidity
-function test_RevertCannotSubtract43() public {
-    vm.expectRevert(stdError.arithmeticError);
-    testNumber -= 43;
-}
-```
-
-6. Test functions must have either **external or public** visibility.
 
 
-
-##### SHARED SETUPS
+#### SHARED SETUPS (setUp() should be updated)
 
 - Use the **HelperConfig.sol and HelperContract.sol** files to extract some important variables and functions.
 
@@ -2629,6 +2675,8 @@ contract MyContractTest is Test, HelperContract {
 
 
 
+
+
 #### Remapping dependencies
 
 - Before running the forge remapping command we need to store the path in **toml**
@@ -2643,6 +2691,24 @@ remapping = ['@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts']
 // Forge can remap dependencies to make them easier to import. Forge will automatically try to deduce some remappings for you:
 forge remappings
 ```
+
+
+
+### FOUNDRY COVERAGE
+
+- Displays which parts of your code are covered by tests.
+
+```solidity
+// View summarized coverage:
+forge coverage
+
+// Create lcov file with coverage data:
+forge coverage --report lcov
+
+// This will create a .txt file that will give us the :
+forge coverage --report debug > coverage.txt
+```
+
 
 
 
@@ -2770,6 +2836,6 @@ You must also add `ffi = true` to your `foundry.toml` to use this feature.
 
 
 
-# Limitations
-- You cannot deploy a contract with `FoundryZkSyncChainChecker` or `ZkSyncChainChecker` because `foundry-zksync` gets confused by a lot of cheatcodes, and doesn't recognize cheatcodes after compiling to the EraVM. 
-
+# Test setup using helperconfig and deploy script
+# interaction script
+# best practices and cheetcodes
