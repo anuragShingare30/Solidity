@@ -2181,7 +2181,7 @@ npx hardhat ignition verify sepolia-deployment
 
 - Foundry totally written on solidity and not on JS.
 
-**Note : dependencies are added as git-submodules and not as npm or nodejs modules** 
+**Note : dependencies are added as git-submodules and not as npm or nodejs modules**
 
 - **src folder** : All our main smart contracts
 - **test folder** : All the test are written here.
@@ -2206,7 +2206,6 @@ forge install openzeppelin/openzeppelin-contracts
 **forge** : the build, test, debug, deploy smart contracts
 **anvil** :  the foundry equivalent of Ganache
 **cast** : low level access to smart contracts (a bit of a truffle console equivalent)
-
 
 #### Compile smart contract
 
@@ -2248,6 +2247,7 @@ uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
 
 
 
+
 #### DEPLOYING SMART CONTRACT (COMMMANDS)
 
 ```solidity
@@ -2281,12 +2281,12 @@ cast wallet list
 ```
 
 
-
-
 ##### DEPLOYING ON TESTNET, ANVIL and ROLLUPS BLOCKCHAIN
 
 - deploy our Smart Contract using Foundry scripts.
 - We will write the deploy code in the **script** folder in solidity.
+
+
 
 **By default, scripts are executed by calling the function named run, our entrypoint.**
 
@@ -2324,10 +2324,10 @@ contract MyScript is Script{
 
 
 
-#### SCRIPTING CONTRACT AND HELPER CONFIG FILE
 
-- We will declare **`HelperConfig.s.sol`** file to declare some common and important variables and functions which can be used by importing.
+#### DEPLOY SCRIPT CONTRACT || HELPERCONFIG FILE || INTERACTION FILE
 
+- In  **`HelperConfig.s.sol`** file we will declare all the `params, function and variables` we need to pass in constructor during deployment.
 
 
 **HelperConfig.s.sol**
@@ -2396,14 +2396,72 @@ contract HelperConfig is Script{
 }
 ```
 
+- In `Interaction.s.sol` we will create functions from which our `on-chain data interacts with off-chain data`
+- Example : chainlink VRF, chainlink automation, Data feeds and chainlink functions.
+
+
+
+
+**Interaction.s.sol**
+```solidity
+import {Lottery} from "src/Lottery.sol";
+import {HelperConfig, CodeConstants} from "./HelperConfig.s.sol";
+
+
+contract FundSubscription is Script{
+
+    function fundSubscriptionWithConfig() public {
+        HelperConfig helperConfig = new HelperConfig();
+        uint subId = helperConfig.getConfig().subscriptionId;
+        fundSubscription(subId);
+    }
+
+    function fundSubscription(uint256 subId) public {
+        uint amount = 0.01 ether;
+        vm.startBroadcast();
+        MockContract(contractAddress).topUpSubscription(amount);
+        vm.stopBroadcast();
+    }
+
+    function run() public {
+        fundSubscriptionWithConfig();
+    }
+}
+
+contract AddConsumer is Script{
+
+    function addConsumerWithConfig() public {
+        HelperConfig helperConfig = new HelperConfig();
+        addConsumer();
+    }
+
+    function addConsumer() public {
+        vm.startBroadcast();
+        MockContract(contractAddress).addConsumers(address(0));
+        vm.stopBroadcast();
+    }
+
+    function run() public {
+        addConsumerWithConfig();
+    }
+}
+```
+
+
+- This is the basic structure of writing **HelperConfig and Interaction** file.
+
+
+
 **By default, scripts are executed by calling the function named run, our entrypoint.**
+
 - This is the `pattern and best practice` we should followed!!!
 
 
 **Deploy.s.sol**
 ```solidity
-import {Contract};
-import {HelperConfig};
+import {Contract} from "../src/Contract.sol";
+import {HelperConfig} from "./HelperConfig.s.sol";
+import {FundSubscription, AddConsumer} from "./Interaction.s.sol";
 
 contract MyScript is Script {
 
@@ -2411,6 +2469,16 @@ contract MyScript is Script {
         // CREATED NEW HELPERNETWORK CONFIG INSTANCE
         HelperConfig helperConfig = new HelperConfig();
         HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
+
+        // If for some valid condition we need to call the interaction.s.sol
+        if(condition){
+            // funding subscription
+            FundSubscription fundSubscription = new FundSubscription();
+
+            // add consumer after deployment
+            AddConsumer addConsumer = new AddConsumer();
+        }
+
 
         vm.startBroadcast();
         // pass all the constructor params here...
@@ -2429,7 +2497,6 @@ contract MyScript is Script {
     }
 }
 ```
-
 
 
 
@@ -2459,6 +2526,7 @@ sepolia = { key = "${ETHERSCAN_API_KEY}" }
 
 
 
+
 #### INTERACTING WITH SC USING CAST
 
 - After deploying sc we can interact (send/call) the functions using **cast**
@@ -2468,6 +2536,7 @@ cast send <address> "setName(string)" "anurag" --rpc-url <rpc_url> --private-key
 cast call <address> "getName()"
 cast to-base 0x7717 dec
 ```
+
 
 
 #### TO USE L2, ROLLUPS BLOCKCHAIN TECH. (EX: ZKSYNC)
@@ -2487,7 +2556,6 @@ foundry-zksync
 
 
 
-
 #### TESTING IN FOUNDRY
 
 - The tests in Foundry are written in Solidity.
@@ -2502,6 +2570,10 @@ foundry-zksync
 3. **FORKED TEST** - TESTING OUR CODE ON A SIMULATED REAL ENVIRONMENT.
 4. **STAGING TEST** - TESTING OUR CODE IN TESTNET/MAINNET. EX:- SEPOLIA, ANVIL LOCAL TESTING
 
+5. **FUZZ TESTING**
+   - Stateful fuzz
+   - stateless fuzz
+   - formal verification
 
 #### FORK TESTING/UNIT TESTING (COMMANDS)
 
@@ -2510,7 +2582,6 @@ foundry-zksync
 
 - Sometimes we need to run test from scratch. Before running test again remove the **cache directory**/**forge clean**
 
-
 ```solidity
 // TO LOAD THE .env CONTENT
 source .env
@@ -2518,21 +2589,18 @@ echo $RPC_URL
 
 // TESTING SC
 forge test -vvv
-
 forge test --fork-url $RPC_URL -vvvv
 
 // TO RUN THE SINGLE TEST
 forge test --mt testFunctionName
 forge test --mt testBalance -vvv --fork-url $RPC_URL
 
-// CONVERGING SC -> This command displays which parts of your code are covered by tests.
-forge converge --fork-url $RPC_URL   
 
 // DEBUGGING SC
 forge debug --debug src/Web3.sol:TestContract --sig "function(argu)" "arguValue"
 
 
-// Forge supports identifying contracts in a forked environment with Etherscan.
+// Verifiying smart contract on etherscan
 forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key>
 ```
 
@@ -2548,130 +2616,166 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 
 
 
+#### Some best practices to followed when writing the tests
 
-#### Some best practices to followed when writing the tests :
+1. **`vm.prank(address(0))`** 
+   - simulate a TNX to be sent from given specific address.
 
-1. **vm.prank(address(0))** - simulate a TNX to be sent from given specific address.
+2. **`vm.deal(address(this), 1 ether)`** 
+   - Used to give the test contract Ether to work with.
 
-2. **vm.deal(address(this), 1 ether)** - Used to give the test contract Ether to work with.
+3. **`vm.expectRevert()`**
+   - Agar mera call/send function revert ho gaya, Toh mera test pass ho jayega.
+   - Else, test fail ho jayega.
 
-3. **vm.expectRevert()**: 
-- Agar mera call/send function revert ho gaya, Toh mera test pass ho jayega.
-- Else, test fail ho jayega.
+4. **`vm.expectRevert(Contract.CustomError.selector)`**    
+   - import the error from contract with 'selector'
 
-4. **vm.expectRevert(Contract.CustomError.selector)**  :  import the error from contract with 'selector' 
+5. **`vm.expectRevert(abi.enocodeSelector(Contract.CustomError.selector, params1, params2))`**
 
-- **vm.expectRevert(abi.enocodeSelector(Contract.CustomError.selector, params1, params2));**
+6. **test_FunctionName**
+   - Functions prefixed with 'test' are run as a test case by forge.
 
-5. **test_FunctionName**: Functions prefixed with 'test' are run as a test case by forge.
+7. **For, testFail** 
+   - A good practice is to use the pattern **test_Revert[If|When]_Condition** in combination with the **expectRevert** cheatcode
 
-6. **For, testFail** : A good practice is to use the pattern **test_Revert[If|When]_Condition** in combination with the **expectRevert** cheatcode 
-
-```solidity
-function test_RevertCannotSubtract43() public {
-    vm.expectRevert(stdError.arithmeticError);
-    testNumber -= 43;
-}
-```
-
-7. **Test functions must have either **external or public** visibility.**
-
-
-8. **type aliases(enum, struct, array,errors,events) can be call using main contract(Lottery) only.**
-
-9. **functions(call/send) can be called by our instance(lottery)**
-
-
-10. **To Transfer some value during calling or Transact eth to SC**
-
-```solidity
-function test_LotteryCheckIfUserIsAdded() external {
-    vm.prank(USER);
-    // by this method we pass some eth to our user.
-    lottery.enterLottery{value:_entranceFee}();
-    }
-```
-
-
-11. **vm.expectEmit()** : a specific log is emitted during the next call.
-
-```solidity
-function test_LotteryEntranceFeeEvents() external{
-    vm.prank(USER);
-    // for indexed params we will set it true 
-    vm.expectEmit(true, false, false,false , address(lottery));
-    emit EnteredUser(USER);
-    lottery.enterLottery{value:_entranceFee}();
-}
-```
-
-
-
-##### WRITING THE UNIT/FORK TEST
-
-```solidity
-import {Test} from "forge-std/Test.sol";
-import {stdError} from "forge-std/StdError.sol";
-
-error Unauthorized();
-
-// MAIN CONTRACT
-contract OwnerUpOnly {
-    address public immutable owner;
-    uint256 public count;
-
-    constructor() {
-        owner = msg.sender;
-    }
-
-    function increment() external {
-        if (msg.sender != owner) {
-            revert Unauthorized();
+    ```solidity
+        function test_RevertCannotSubtract43() public {
+            vm.expectRevert(stdError.arithmeticError);
+            testNumber -= 43;
         }
-        count++;
+    ```
+
+8. **Test functions must have either **external or public** visibility.**
+
+
+9. **type aliases(enum, struct, array,errors,events) can be call using main contract(Lottery) only.**
+    ```solidity
+    function test_GetRaffleState() public view {
+        assert(lottery.getLotteryStatus() == Lottery.LotteryStatus.Open);
     }
-}
+    ```
 
-// test/ContractTest.t.sol
-contract OwnerUpOnlyTest is Test {
-    // NEW CONTRACT INSTANCE
-    OwnerUpOnly upOnly;
-    
-    // DEFAULT FUNCTION
-    function setUp() public {
-        upOnly = new OwnerUpOnly();
+
+10.  **functions(call/send) can be called by our instance(lottery)**
+    ```solidity
+    function test_CheckEntranceFee() public view {
+        assertEq(lottery.getEntryFeeAmount(), 0.01 ether);
     }
-    // TEST FUNCTION
-    function test_IncrementAsOwner() public {
-        assertEq(upOnly.count(), 0);
-        upOnly.increment();
-        assertEq(upOnly.count(), 1);
+    ```
+
+
+11.  **To Transfer some value during calling or Transact eth to SC**
+
+    ```solidity
+    function test_LotteryCheckIfUserIsAdded() external {
+        vm.prank(USER);
+        // by this method we pass some eth to our user.
+        lottery.enterLottery{value:_entranceFee}();
+        }
+    ```
+
+
+12. **`vm.expectEmit()`** : 
+    -  a specific log is emitted during the next call.
+
+    ```solidity
+    function test_LotteryEntranceFeeEvents() external{
+        vm.prank(USER);
+        // for indexed params we will set it true 
+        vm.expectEmit(true, false, false,false , address(lottery));
+        emit EnteredUser(USER);
+        lottery.enterLottery{value:_entranceFee}();
     }
-}
-```
+    ```
 
 
 
-#### SHARED SETUPS (setUp() should be updated)
+13. **`vm.warp() || vm.roll()`**
+    - Sets block.timestamp.
+    - Sets block.timestamp.
 
-- Use the **HelperConfig.sol and HelperContract.sol** files to extract some important variables and functions.
+    ```solidity
+    function test_UserNotAllowedToEnterLotteryWhenClosed() external {
+        vm.prank(USER);
+        lottery.enterLottery{value:_entranceFee}();
+        vm.warp(block.timestamp + _interval + 1);
+        vm.roll(block.timestamp + 1);
+    }
+    ``` 
 
+
+14. **`vm.recordLogs() || vm.getRecordedLogs()`**
+    - Tells the VM to start recording all the emitted events.
+    - To access them, use `getRecordedLogs`  
+
+    ```solidity
+    function test_GetEventsLogs() public {
+        vm.recordLogs();
+        lottery.performUpkeep("");
+        Vm.Log[] memory logs = vm.getRecordedLogs();
+        bytes32 value = logs[1].topics[1];
+        assert(uint256(value) > 0);
+    }
+    ``` 
+
+
+
+
+
+#### WRITING UNIT/FORK TEST
+
+- For, advance testing we will use `HelperConfig, Contract and Deploy` file.
+- Follow, `Best practices and vm cheatcodes above for advance and better testing`.
+
+
+**Contract.t.sol**
 ```solidity
-abstract contract HelperContract {
-    // HERE, WE WILL DECLARED SOME IMP. AND COMMON VARIABLES AND FUNCTIONS
-    address constant IMPORTANT_ADDRESS = 0x543d...;
-    SomeContract someContract;
-    constructor() {...}
-}
+import {Contract} from "src/Contract.sol";
+import {ContractScript} from "script/Deploy.s.sol";
+import {HelperConfig,CodeConstants} from "script/HelperConfig.s.sol";
 
-contract MyContractTest is Test, HelperContract {
-    // INHERIT THE HELPER CONTRACT TO USE COMMON VARIABLE AND FUNCTIONS
+
+contract ContractTest is Test {
+    Contract contracts;
+    HelperConfig helperConfig;
+
+    // all constructor params and used variables
+    uint params1;
+    uint params2;
+    uint params3;
+
+    // events : Copy all events from contract to be used
+
+    /**
+       * here we will use our deploy script contract instance
+       * our deploy script setUp() returns 'Main contract' and 'HelperConfig contract'
+       * provide some eth to user for testing
+    */
+
     function setUp() public {
-        someContract = new SomeContract(0, IMPORTANT_ADDRESS);
-        ...
+        ContractScript contractScript = new ContractScript();
+        (contracts,helperConfig) = contractScript.setUp();
+        HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
+        _param1 = config.param1;
+        _param2 = config.param2;
+        _param3 = config.param3;
+
+        // provide some eth to user for testing
+        vm.deal(address(0),1e18);
     }
+
+    function test_GetContractStatus() public {
+        assert(contracts.getStatus() == Open);
+    }
+
+    function test_SomeChecks() external {
+        assert(contracts.getSomeVar() == 1 ether);
+    }
+
 }
 ```
+
 
 
 
@@ -2694,6 +2798,7 @@ forge remappings
 
 
 
+
 ### FOUNDRY COVERAGE
 
 - Displays which parts of your code are covered by tests.
@@ -2712,8 +2817,6 @@ forge coverage --report debug > coverage.txt
 
 
 
-
-
 ### FOUNDRY-DEVOPS
 
 # foundry-devops
@@ -2723,12 +2826,11 @@ A repo to get the most recent deployment from a given environment in foundry. Th
 It will look through your `broadcast` folder at your most recent deployment.
 
 ## Features
+
 - Get the most recent deployment of a contract in foundry
 - Checking if you're on a zkSync based chain
 
-
 # Getting Started
-
 
 ## Installation
 
@@ -2740,9 +2842,7 @@ forge install Cyfrin/foundry-devops --no-commit
 forge install foundry-rs/forge-std@v1.8.2 --no-commit
 ```
 
-
 #### Usage - Getting the most recent deployment
-
 
 **1. Update your `foundry.toml` to have read permissions on the `broadcast` folder.**
 
@@ -2770,12 +2870,13 @@ function interactWithPreviouslyDeployedContracts() public {
 }
 ```
 
-
 ## Usage - zkSync Checker
 
 ### Prerequisites
+
 - [foundry-zksync](https://github.com/matter-labs/foundry-zksync)
   - You'll know you did it right if you can run `foundryup-zksync --help` and you see a response like:
+
 ```
 The installer for Foundry-zksync.
 
@@ -2799,20 +2900,20 @@ contract MyContract is ZkSyncChainChecker {
   function doStuff() skipZkSync {
 ```
 
-### ZkSyncChainChecker modifiers:
+### ZkSyncChainChecker modifiers
+
 - `skipZkSync`: Skips the function if you are on a zkSync based chain.
 - `onlyZkSync`: Only allows the function if you are on a zkSync based chain.
   
+### ZkSyncChainChecker Functions
 
-
-### ZkSyncChainChecker Functions:
 - `isZkSyncChain()`: Returns true if you are on a zkSync based chain.
 - `isOnZkSyncPrecompiles()`: Returns true if you are on a zkSync based chain using the precompiles.
 - `isOnZkSyncChainId()`: Returns true if you are on a zkSync based chain using the chainid.
 
 ### Usage - FoundryZkSyncChecker
 
-In your contract, you can import and inherit the abstract contract `FoundryZkSyncChecker` to check if you are on the `foundry-zksync` fork of `foundry`. 
+In your contract, you can import and inherit the abstract contract `FoundryZkSyncChecker` to check if you are on the `foundry-zksync` fork of `foundry`.
 
 > !Important: Functions and modifiers in `FoundryZkSyncChecker` are only available if you run `foundry-zksync` with the `--zksync` flag.
 
@@ -2824,18 +2925,13 @@ contract MyContract is FoundryZkSyncChecker {
   function doStuff() onlyFoundryZkSync {
 ```
 
-You must also add `ffi = true` to your `foundry.toml` to use this feature. 
+You must also add `ffi = true` to your `foundry.toml` to use this feature.
 
-### FoundryZkSync modifiers:
+### FoundryZkSync modifiers
+
 - `onlyFoundryZkSync`: Only allows the function if you are on `foundry-zksync`
 - `onlyVanillaFoundry`: Only allows the function if you are on `foundry`
 
-### FoundryZkSync Functions:
+### FoundryZkSync Functions
+
 - `is_foundry_zksync`: Returns true if you are on `foundry-zksync`
-
-
-
-
-# Test setup using helperconfig and deploy script
-# interaction script
-# best practices and cheetcodes
