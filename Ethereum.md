@@ -1,24 +1,25 @@
 # Solidity Programming Language Guide 😎
 
-
 ### Software and Platform Used!!!
 
 **RPC Provider**
+
 1. Infura RPC provider
 2. Alchemy RPC Provider
 
 **Contracts**
+
 1. Openzeppllein
 2. Chainlink VRFv2.5
 3. Chainlink automationv2.1
 4. Alchemy contracts
 
 **wallets and Frameworks**
+
 1. Metamask
 2. Hardhat
 3. Foundry-forge
 4. Web3.js/ethers.js
-
 
 ### Best Practices of smart contract to be followed
 
@@ -32,9 +33,6 @@
 /// @return Returning variable of function
 /// @param  A Parameters used in function
 ```
-
-
-
 
 **Layout of Contract:**
 // version
@@ -58,7 +56,6 @@
 // internal & private view & pure functions
 // external & public view & pure functions
 
-
 ### SIMPLE STRUCTURE FOR SOLIDITY SMART CONTRACT.
 
 - Here we will see the simple layout and structure to write the solidity smart contracts.
@@ -76,7 +73,6 @@ contract MyFirstContract {
 
 ```
 
-
 ### VARIABLES IN SOLIDITY.
 
 - Variables in sol is similar to javascript. Except address.
@@ -88,7 +84,6 @@ string public str = "Hello world";
 
 bool public correct = true/false;
 ```
-
 
 ### STRINGS AND BYTES.
 
@@ -104,7 +99,6 @@ function getMyString(string memory _myString) public {
 }
 ```
 
-
 - Bytes have the length property.
 
 ```solidity
@@ -112,7 +106,6 @@ bytes public myBytes = "Hello";
 
 // myBytes = 0x72375375bc758734784c834874
 ```
-
 
 ### BASIC FUNCTIONS TO WRITE SIMPLE S.C .
 
@@ -122,7 +115,7 @@ bytes public myBytes = "Hello";
 uint256 result;
 
 function addition(uint256 a, uint256 b) public returns(uint256){
-    return result=a+b;  
+    return result=a+b;
 }
 ```
 
@@ -134,11 +127,10 @@ function get() public view returns (uint256){
 }
 ```
 
-
-
 ### FUNCTION VISIBILITY.
 
 1. **Public** : Can be used internally and externally.
+
 - Our metamask wallet and other smart contracts can call this type of function.
 
 ```solidity
@@ -158,9 +150,9 @@ function addition() private {
 ```
 
 3. **Internal** : Can be used within the contract and other inheriting contract.
+
 - Our metamask cannot used the internal function.
 - But, inheriting contracts can used this function.
-
 
 ```solidity
 
@@ -173,7 +165,7 @@ contract Children {
 }
 
 contract Parent is Children {
-    
+
     uint256 x;
     // Here we have use the function from child contract.
     // Inheriting.
@@ -184,6 +176,7 @@ contract Parent is Children {
 ```
 
 4. **External** : Can only be accessed from external contracts or accounts.
+
 - We cannot used this function internally inside an other function.
 - Our metamask wallet can accessed this type of function.
 
@@ -194,8 +187,6 @@ function add(uint256 num) external {
 ```
 
 - The 'public' function uses more ethereum gas fees than 'external' function.
-
-
 
 #### NOTE : The default behavior to error out if the maximum/minimum value is reached. But you can still enforce this behavior. With an 'unchecked' block. Let's see an example.
 
@@ -216,7 +207,7 @@ function Test2() public {
 }
 ```
 
-### CONSTRUCTOR FUNCTION 
+### CONSTRUCTOR FUNCTION
 
 - It is a special function that is called only once during contract deployment.
 - It is automatically called during Smart Contract deployment. And it can never be called again after that.
@@ -224,11 +215,10 @@ function Test2() public {
 ```solidity
 constructor(uint256 _myaddress) {
     owner = _myaddress;
-    
+
     owner = msg.sender;
 }
 ```
-
 
 ### PAYABLE MODIFIER
 
@@ -243,10 +233,9 @@ function getMessage(string memory _myMessage) public payable {
 
 ```
 
-
 ### msg OBJECT
 
-- The msg-object contains information about the current message with the smart contract. 
+- The msg-object contains information about the current message with the smart contract.
 - It's a global variable that can be accessed in every function.
 
 ```solidity
@@ -255,36 +244,32 @@ string public myMessage = "Hello World";
 function updateString(string memory myMessage) public payable {
     if(msg.value == 1 ether) {
         myMessage = myMessage;
-    } 
+    }
     else{
         payable(msg.sender).transfer(msg.value);
     }
 }
 ```
 
-- **msg.sender** is the address of the person who deployed the Smart Contract.  
+- **msg.sender** is the address of the person who deployed the Smart Contract.
 - **msg.value** is used to get the amount of ETH sent along with a transaction to a smart contract.
-
-
 
 ### RECEIVE FUNCTION
 
-- **Low-Level interaction** 
+- **Low-Level interaction**
 - This is the function that is executed on plain Ether transfers.
-- The receive function is executed on a call to the contract with empty calldata.   
+- The receive function is executed on a call to the contract with empty calldata.
 - The receive function can only rely on 2300 gas being available.
-
 
 ```solidity
 uint public value;
 string public message;
 
-receive() external payable { 
+receive() external payable {
     value = msg.value;
     message = "recieved";
 }
 ```
-
 
 ### FALLBACK FUNCTION (Handling ether transaction)
 
@@ -294,31 +279,27 @@ receive() external payable {
 - The fallback function always receives data, but in order to also receive Ether it must be marked payable.
 - If Ether is sent to the contract without any data or with data that doesn't match any existing function signatures, the fallback function is triggered
 
-
 ```solidity
 uint public value;
 string public message;
 
-receive() external payable { 
+receive() external payable {
     value = msg.value;
     message = "recieved";
 }
 
-fallback() external payable { 
+fallback() external payable {
     value = msg.value;
     message = "fallback";
-} 
+}
 ```
 
 - **receive()** is a function that gets priority over **fallback()** when a calldata is empty.
-- But **fallback** gets precedence over **receive** when calldata does not fit a valid function signature.  
-
-
+- But **fallback** gets precedence over **receive** when calldata does not fit a valid function signature.
 
 #### SENDING ETHER TO SPECIFIC ADDRESS
 
 - To send ETH on specific address we can use **transfer function**
-
 
 ```solidity
 // 1.
@@ -331,12 +312,9 @@ payable(address.transfer(amount));
 
 - To receive an ETH on specific address, the address variable should also be an **payable**
 
-
 #### NOTE : The **address(this)** expression refers to the contract's own address within its code.
+
 #### **address(this).balance** returns the balance of the smart contract.
-
-
-
 
 ### MAPPING TYPES (mapping(KeyType => ValueType))
 
@@ -345,7 +323,6 @@ payable(address.transfer(amount));
 - **ValueType** can be any type, including mappings, arrays and structs.
 
 - It is an key and value datatype that does not have lenght or storage property.
-
 
 ```solidity
 mapping (address => uint) public Balance;
@@ -360,12 +337,9 @@ function withDrawMoney(address to, uint amount) public payable {
 }
 ```
 
-
 - Understand the mapping as **key:value** pair.
 - In mapping the datatypes has its default value initially.
 - **mappings** do not have a length or a concept of a key or value being set.
-
-
 
 ### STRUCTS
 
@@ -396,7 +370,6 @@ payment.from = msg.sender;
 payment.amount = msg.value;
 
 ```
-
 
 ### NESTING MAPS IN STRUCT.
 
@@ -431,16 +404,13 @@ function checkBalance(address _address) public view returns (uint){
 
 - By using **struct** inside an **mappings**, will be easier to handle the transaction.
 
-
-
-
 ### ARRAYS IN SOLIDITY.
 
 - Just like an array in JS, arrays is solidity work exactly same.
 
 ```solidity
 contract SampleArray {
-    
+
     uint[] public dynamicArray;
     string[] public StringArray;
 
@@ -461,11 +431,8 @@ contract SampleArray {
     }
 }
 ```
+
 - An array can be of any data type (uint, string, struct, enum).
-
-
-
-
 
 ### ARRAY AND STRUCT (ARRAY AND JS OBJECT).
 
@@ -497,10 +464,9 @@ function getReportCard() public view returns(StudentReport[] memory){
 
 ```
 
-
 ### EXCEPTION HANDLING IN SOLIDITY.
 
-1. **require() Statements** 
+1. **require() Statements**
 
 - **require(condition,"Error Occurred!!!")**
 - It read as if condition is false it will throw an error exception with log statement.
@@ -525,7 +491,6 @@ function withDrawMoney(address payable to, uint amount) public payable {
 
 - **require()** statement works exactly opposit to if-else statements.
 
-
 2. **assert() statements** (DON'T KNOW WHEN TO USE???)
 
 - Assert is used to check invariants
@@ -542,7 +507,7 @@ function deposit() public payable {
 }
 
 function withDrawMoney(address payable to, uint8 amount) public payable {
-        
+
     require(amount <= Balance[msg.sender], "Not enough funds!!!");
     assert(Balance[msg.sender] >= Balance[msg.sender] - amount);
     Balance[msg.sender] -= amount;
@@ -550,7 +515,6 @@ function withDrawMoney(address payable to, uint8 amount) public payable {
 }
 
 ```
-
 
 3. **try/catch statements**
 
@@ -565,7 +529,7 @@ contract ExampleTryCatch {
 }
 
 contract ErrorHandling {
-    event ErrorLogging(string reason); 
+    event ErrorLogging(string reason);
     event ErrorLoggingCode(uint errorcode);
 
     function handlingError() public {
@@ -586,7 +550,6 @@ contract ErrorHandling {
 
 ```
 
-
 ### enum type in solidity
 
 - **enum** can have multiple values
@@ -603,14 +566,9 @@ contract Enum {
 }
 ```
 
-
-
-
 ### LOW-LEVEL SOLIDITY CALLS (INTERACTING WITH TWO SMART CONTRACT).
 
 - Low-Level solidity call refers to **recieve the funds from other smart contracts.**
-
-
 
 ```solidity
 contract ContractOne {
@@ -626,7 +584,7 @@ contract ContractOne {
     }
 
     // 2. REQUIRES FALL-BACK FUNCTION TO RECIEVE THE FUNDS FROM DIFFERENT SMART CONTRACTS.
-    receive() external payable { 
+    receive() external payable {
         deposit();
     }
 }
@@ -637,7 +595,7 @@ contract ContractTwo {
 
     function DepositInContractOne(address to, uint amount) public {
 
-        // 1. 
+        // 1.
         ContractOne one = ContractOne(to);
         one.deposit{value:amount, gas:100000}();
 
@@ -664,8 +622,6 @@ one.deposit{value:amount, gas:100000}();
 (bool send,) = to.call{value:amount, gas:100000}("");
 require(send);
 ```
-
-
 
 ### EVENTS
 
@@ -695,7 +651,6 @@ contract Events {
 // THE LOGS WILL BE DISPLAYED ON THE 'logs' FIELD IN OUTPUT.
 ```
 
-
 ### MODIEFIERS, INHERITANCE AND IMPORTS IN SOLIDITY.
 
 - Let's see a simple smart contract and how we can use the modifiers, inheritance and imports in our smart contracts.
@@ -715,7 +670,7 @@ contract InheritedContract{
     modifier isOwner(){
         require(msg.sender == owner, "You are not allowed");
         // placeholder input
-        _;  
+        _;
     }
 }
 
@@ -747,12 +702,10 @@ contract InheritedContract is InheritedContract {
 
 ```
 
-
 #### MODIFIERS
 
 - Right now we have several similar require statements.
 - To avoid code duplication and make it easier to change this from a single place, we can use modifiers
-
 
 ```solidity
 modifiers onlyOwner(){
@@ -791,7 +744,6 @@ contract Sample is Owned{
 
 ```
 
-
 #### IMPORTS
 
 - Now, we export smart contract from one file to another using importing.
@@ -823,9 +775,6 @@ contract SampleSmartContract is Owned {
 
 - We can inherit the smart contract from one file to another file.
 
-
-
-
 ### CONTRACT TO CONTRACT INTERACTION (INTERFACE)
 
 - Sometimes we are required different smart contract to handle some conditions necessary to our DApps.
@@ -856,7 +805,7 @@ contract ContractB {
     constructor(address _smartcontractAddress) {
         contractA = IContractA(_smartcontractAddress);
     }
-    
+
     function setDataInContractA(uint _data) external  {
         contractA.setData(_data);
     }
@@ -864,12 +813,10 @@ contract ContractB {
 
 ```
 
-
 ### WITHDRAW MONEY FROM SMART CONTRACT
 
 - After minting an nft's the price will be stored in smart contract and not in owners balance.
 - To withdraw money,
-
 
 ```solidity
 function withDrawMoney(address _address) external payable {
@@ -880,20 +827,16 @@ function withDrawMoney(address _address) external payable {
 
 - **address(this)** will return the current smart contract address.
 
-
 ### INTRODUCTION TO WEB3.JS
 
 - **Web3.js** is a JavaScript-library that lets us interact with a blockchain node via its RPC interface or Websockets.
 - Here, there are **JavaScript functions** to interact with a blockchain node.
-
 
 #### WEB3 PROVIDERS (WEBSOCKETS PROVIDERS).
 
 - Web3.js is not sending the requests directly, it abstracts it away into these providers (EIP-6963, EIP-1193).
 - Here, we can have example of metamask which automatically connects with website.
 - Similarly, for **Web3 Providers** lastly it is connecting to the blockchain node.
-
-
 
 #### ABI(Application Binary Interface) ARRAY.
 
@@ -921,12 +864,10 @@ let abiArray = [
 ]
 ```
 
-
 #### INTERACTION WITH SMART CONTRACT (web3.eth)
 
 - We can use **Web3** libraries to interact with our smart contract.
 - **web3.eth** provide us different methods/functions to interact with smart contract
-
 
 ```solidity
 // TO GET THE ACCOUNTS
@@ -978,7 +919,7 @@ contract setData {
 ];
 
     let contract = new web3.eth.Contract(abiArray,contractAddress);
-    
+
     // TO UPDATE ANY STATE VARIABLE
     async function setData(newData){
         await contract.methods.setData(newData).send({from : accounts[0]});
@@ -994,11 +935,9 @@ contract setData {
 
 - From above code we can interact with smart contracts.
 
-1. **new web3.eth.Contract()  ->  await myContract.methods.myMethod().call()**  To call an variable
+1. **new web3.eth.Contract() -> await myContract.methods.myMethod().call()** To call an variable
 
-2. **new web3.eth.Contract() -> await myContract.methods.myMethod({from:account[0]}).send()**  To update variable or function with params.
-
-
+2. **new web3.eth.Contract() -> await myContract.methods.myMethod({from:account[0]}).send()** To update variable or function with params.
 
 ### WORKING OF IPFS(InterPlanetary File Storage) and CID(Content Identifier).
 
@@ -1006,11 +945,10 @@ contract setData {
 - Storing data on blockchain is way expensive. So, the company store their data on **centralized server and cloud providers**
 - In IPFS, files and other data are stored in a network of nodes.
 - When a file is added to IPFS, it is split into smaller blocks, hashed using hash algorithm (SHA-256).
-- This hash is called as **CID(Content Identifier).** 
+- This hash is called as **CID(Content Identifier).**
 - Everytime re-uploading file a new CID is generated.
-- To retrieve data, a user requests it using the hash. 
+- To retrieve data, a user requests it using the hash.
 - IPFS locates the nodes storing the corresponding blocks and downloads them.
-
 
 #### Location Addressing vs Content Addressing
 
@@ -1018,22 +956,18 @@ contract setData {
 
 2. IPFS uses content-based addressing, where content is accessed by a hash of its content. This ensures that as long as the content remains the same, its address does not change.
 
-
 #### PINNING SERVICE TO PINNED A NODE.
 
 - If file is not in used in node using garbage collection process, file will be deleted.
-- To prevent from garbage collection process we will use pinning service. 
-
+- To prevent from garbage collection process we will use pinning service.
 
 ### TYPES OF WEB3 STORAGE.
 
-- **On-chain storage** refers to the practice of storing data directly on the blockchain, leveraging its inherent security features but at the cost of speed and expense. 
+- **On-chain storage** refers to the practice of storing data directly on the blockchain, leveraging its inherent security features but at the cost of speed and expense.
 
 - **off-chain decentralized storage** involves storing data across a network of decentralized nodes or servers.(IPFS)
 
 - **Off-chain private storage solutions** encompass traditional cloud-based and legacy data storage options designed for secure and controlled access.
-
-
 
 ### NFT METADATA
 
@@ -1045,41 +979,39 @@ contract setData {
 // NFT-MetaData-Template
 
 {
-    "name":"Cryptodunks #101",
-    "description":"",
-    "image":"ipfs://QmXtHPbZoUNkUwGcZTcqD8TLRtozdxpjReMroioMPEvkSC/0.png",
-    "attributes":[
-        {
-            "trait_type":"language",
-            "value":"JavaScript"
-        },
-        {
-            "trait_type":"OS",
-            "value":"Windows"
-        },
-        {
-            "trait_type":"Token",
-            "value":"ERC-721"
-        }
-    ]
+  "name": "Cryptodunks #101",
+  "description": "",
+  "image": "ipfs://QmXtHPbZoUNkUwGcZTcqD8TLRtozdxpjReMroioMPEvkSC/0.png",
+  "attributes": [
+    {
+      "trait_type": "language",
+      "value": "JavaScript"
+    },
+    {
+      "trait_type": "OS",
+      "value": "Windows"
+    },
+    {
+      "trait_type": "Token",
+      "value": "ERC-721"
+    }
+  ]
 }
-
 ```
 
 - We can see our minted and deployed NFT on opensea (Testnet) through Etherscan and also on our Metamask portfolio.
 
-
-
 ### Fungible and Non-fungible(NFT) token
 
 1. **Fungible tokens(cryptocurrencies)** : These tokens are identical and can be exchanged for one another with equal value. Think of fungible tokens like currency
+
 - interchangeable, identical in value (e.g., money).
 
 2. **Non-fungible tokens(NFTs)** : These tokens are unique and cannot be exchanged on a one-to-one basis for something of equal value because each one has its distinct attributes.
+
 - NFTs are often used to represent digital art, collectibles, or unique assets
 - like a serial number or unique content
 - unique, distinct in value (e.g., a rare collectible).
-
 
 ### TOPICS COVERED IN ERC - 721, 1155, 721A (Ethereum Request for Comment)
 
@@ -1094,15 +1026,11 @@ contract setData {
 9. Refund functionality and Refund time period
 10. Testing smart contract on Testnet
 
-
-
 ### TOKENS(ERC-20,721,1155,1155A)
 
 - **Token** is a representation of something in the digital or physical world that resides on the Ethereum blockchain
-- Managed by a smart contract, which is a program on Ethereum, a token can represent just about anything. 
+- Managed by a smart contract, which is a program on Ethereum, a token can represent just about anything.
 - **It can be fungible(cryptocurrency) and non-fungible(NFT)**
-
-
 
 #### ERC-20(Fungible) TOKEN
 
@@ -1110,8 +1038,8 @@ contract setData {
 - For tokens where every unit is the same (like currency).
 
 **EXAMPLE**
-- ERC20 is exactly the same as any other ERC20, just like how one dollar is the same as another dollar.
 
+- ERC20 is exactly the same as any other ERC20, just like how one dollar is the same as another dollar.
 
 ```solidity
 // ERC-20 TOKEN SAMPLE CONTRACT FROM OZ
@@ -1122,12 +1050,11 @@ contract Web3 is ERC20, Ownable {
     {
         _mint(msg.sender, 10000 * 10 ** decimals());
     }
-    
+
 }
 ```
+
 - A simple ERC20 token sample contract. Here, we can add minting,burning and allowance function further more...
-
-
 
 #### ERC-721(Non-Fungible) TOKEN
 
@@ -1137,28 +1064,22 @@ contract Web3 is ERC20, Ownable {
 - Each NFT has its own value based on its uniqueness.
 - For unique, one-of-a-kind items (like art or collectibles).
 
-
 **EXAMPLE**
+
 - Think of an NFT for a unique piece of digital artwork. If you have a token representing **DigitalArt#1**, it's unique and can't just be swapped for **DigitalArt#2**
-
-
-
 
 #### ERC-1155(Fungible and Non-Fungible) TOKEN
 
 - **ERC1155** is a flexible standard that allows both **fungible and non-fungible** tokens within the **same smart contrac**t.
 - This means you can create tokens that are all the same, all unique, or even some of each!
-- A mix, allowing both identical and unique items in one contract 
-
+- A mix, allowing both identical and unique items in one contract
 
 **EXAMPLE**
+
 - Imagine a game where you have coins(fungible) and weapons(non-fungible).
-- With ERC1155, you can have GameCoins(all identical) and unique items like rare swords or shields, all in one place. 
-
-
+- With ERC1155, you can have GameCoins(all identical) and unique items like rare swords or shields, all in one place.
 
 #### COMMON FUNCTION IN ABOVE TOKENS
-
 
 1. **PUBLIC MINT FUNCTION**
 
@@ -1225,7 +1146,6 @@ function publicMint(uint256 id, uint256 amount) public payable {
 
 - **AllowListMint** function is same just add mapping of allowlist addresses.
 
-
 6. **ADD URI FUNCTION (ERC1155)**
 
 - This will return us the link for our **NFT Metadata through IPFS**
@@ -1241,11 +1161,10 @@ function uri(uint256 _id) public view virtual override returns (string memory){
 }
 ```
 
-
 7. **PAYMENT SPLITTER (ERC-1155)**
 
-- IT SPLITS BETWEEN THE ADDRESS(_payees) FOR SHARES(_shares).
-- WE WILL ADD **address_array and shares_array** DURING DEPLOYMENT. 
+- IT SPLITS BETWEEN THE ADDRESS(\_payees) FOR SHARES(\_shares).
+- WE WILL ADD **address_array and shares_array** DURING DEPLOYMENT.
 
 ```solidity
 constructor(address[] memory _payees, uint[] memory _shares)
@@ -1256,9 +1175,8 @@ constructor(address[] memory _payees, uint[] memory _shares)
 
     }
 ```
+
 - This can be integrated in our DApps.
-
-
 
 8. **PUBLIC MINT (ERC-721A)**
 
@@ -1297,7 +1215,7 @@ function refund(uint tokenId) external payable {
     // refund the price
     uint refundAmount = getRefundAmount(tokenId);
     payable(msg.sender).transfer(refundAmount);
-}   
+}
 
 
 // GET REFUND AMOUNT
@@ -1309,14 +1227,11 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 }
 ```
 
-
-
 ### LIQUIDITY POOL (moneyjar -> smart contract)
 
 - A liquidity pool on the Ethereum blockchain is like a big **money jar** filled with two types of tokens (ETH AND ERC-20).
 - Here, people can trade directly with this jar, making it much faster and easier.
 - Anyone who wants to trade ETH for DAI (or DAI for ETH) can use this jar.
-
 
 #### Process followed when Pool is created and its Trading
 
@@ -1324,9 +1239,6 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 2. **Trading** : Now, anyone who wants to trade ETH for DAI (or DAI for ETH) can use this smart contract(jar)
 3. **Swapping** : When someone swaps ETH for DAI, the pool takes in ETH and gives out DAI.
 4. **Pricing** : The prices adjust automatically based on how much ETH and DAI are in the jar.
-
-
-
 
 ### NFT STAKING SMART CONTRACT (ERC-20 AND ERC-721)
 
@@ -1336,61 +1248,47 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 - In exchange, they earn rewards, usually in the **form of tokens(ERC20)** or other benefits.
 - It's a way for NFT owners to gain extra value from their NFTs without selling them.
 
-
 #### FLOW OF NFT STAKING SC
 
-- To understand the process flow we will consider some basic tokens and contract : 
+- To understand the process flow we will consider some basic tokens and contract :
 
 **Staking SmartContract(App)** : A contract with functions for staking, unstaking, and getting rewards (main function).
 **ERC-721(NFT)** : The NFT that users lock up for a set period when staking.
 **ERC-20(token)** : The reward token users earn when they unstake their NFTs.
 
-
 1. **STAKING** : NFT holders connect their wallets to the staking platform and select an NFT they want to stake.
 2. **Lock Period** : The NFT is locked and temporarily transferred to the smart contract for a specific time
-3. **Rewards** : For keeping their NFT staked, users earn rewards like tokens, points. 
-depending on the terms of the smart contract and company for which we are building
+3. **Rewards** : For keeping their NFT staked, users earn rewards like tokens, points.
+   depending on the terms of the smart contract and company for which we are building
 4. **Unstaking** : When the lock period ends, users can withdraw their NFT and collect any rewards they earned.
-
-
-
 
 ### L1, L2 AND ROLL-UPS IN ETHEREUM BLOCKCHAIN
 
-
-1. **Layer1 (Main Blockchain Layer)**  -> **(Bitcoin, Ethereum, and Solana)**
+1. **Layer1 (Main Blockchain Layer)** -> **(Bitcoin, Ethereum, and Solana)**
 
 - the foundational blockchain layer, the core network where transactions are processed directly.
 - They each have their own rules, consensus mechanisms, and security.
 
 - **Problem** Layer 1 blockchains can get slow and expensive when there's high demand of tsx
 
-
-2. **LAYER2 (Secondary Layer on Top of Layer1)**  -> **(Polygon, Arbitrum, and Optimism)**
+2. **LAYER2 (Secondary Layer on Top of Layer1)** -> **(Polygon, Arbitrum, and Optimism)**
 
 - Layer2 solutions are built on top of Layer1 blockchains.
 - handle transactions faster and more cheaply.
 - They offload some transactions from the main chain and then submit them in batches to Layer 1.
 
-- **BENEFITS** :  Layer 2 can offer faster processing and lower fees,
+- **BENEFITS** : Layer 2 can offer faster processing and lower fees,
 
-
-
-3. **Rollups (Special Type of Layer 2 Solution)**  ->  **Arbitrum, zkSync**
+3. **Rollups (Special Type of Layer 2 Solution)** -> **Arbitrum, zkSync**
 
 - Rollups bundle many transactions together, process them on Layer 2, and then send a single, compact summary back to Layer 1 for finalization.
 - This reduces the number of transactions Layer 1 has to handle directly.
 
 - **BENEFITS** : Rollups improve scalability even more than regular Layer2s by minimizing amount of data sent to the main chain.
 
-
-
-
-
 ### ORACLE PROBLEMS / SMART CONTRACT CONNECTIVITY PROBLEM
 
 - The **Oracle problems** refers to the connectivity issue of smart contract with the off-chain data(such as market-data, api_calls, api-data) with on-chain data.
-
 
 - **Blockchain Oracles** is any device that interacts with the off-chain world to provide external data or computation on on-chain.
 - **Blockchain oracle** is a secure piece of middleware that facilitates communication between blockchains and any off-chain system, including data providers, web APIs, enterprise backends, cloud providers, IoT devices, e-signatures, payment systems.
@@ -1399,8 +1297,8 @@ depending on the terms of the smart contract and company for which we are buildi
 - **Chainlink is a decentralized Oracle Network**
 - When a smart contract combines on-chain and off-chain data, can be defined as **hybrid smart contract**
 
-
 **Now, how this blockchain oracles work**:
+
 - With the help of **decentralized oracle network**
 - On off-chain, chainlink nodes will store external data from data-providers.
 - On on-chain, the chainlink node will transfer the data to **Reference contract** so that other contract can used this data.
@@ -1408,11 +1306,179 @@ depending on the terms of the smart contract and company for which we are buildi
 - Here, we will use the **chainlink functions** to get the external data for our smart contract
 - And, this chainlink function will be the future of DeFi apps.
 
-
 1. **CHAINLINK FUNCTIONS**
 2. **CHAINLINK VRF**
 3. **CHAINLINK AUTOMATION**
 4. **END-TO-END RELIABILITY(TAKE INPUT, RETURN OUTPUT)**
+
+
+
+
+
+#### CHAINLINK VRF
+
+- Chainlink VRF (Verifiable Random Function) is a provably fair and verifiable random number generator (RNG)
+- that enables smart contracts to access random values without compromising security or usability.
+- Use Chainlink VRF to build reliable smart contracts for any applications that rely on unpredictable outcomes
+
+
+
+**Two methods to request randomness**
+
+1. `Subscription Method`(Programmaticaly || Manually)
+
+   - Create Subscription
+   - Get Subscription ID
+   - Fund the Subscription
+   - Add contract address as consumer
+   - Use the random number
+
+2. `Direct funding`
+   - Add consumer
+   - allow contract to pay TNX fee to request random number
+
+
+
+
+
+
+#### CHAINLINK VRF (SUBSCRIPTION METHOD)
+
+- To get the a random word, we will follow the following structure :
+  - requestRandomWords
+  - fulfillRandomWords
+  - Getting the random word
+
+1. **Import the libiraries**
+
+   ```solidity
+    import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
+    import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+
+    contract MyContract is VRFConsumerBaseV2Plus{}
+   ```
+
+2. **Contract Variables**
+
+   ```solidity
+    uint256 s_subscriptionId;
+    address vrfCoordinator;
+    bytes32 s_keyHash;
+    uint32 callbackGasLimit;
+    uint16 requestConfirmations;
+    uint32 numWords =  1;
+   ```
+
+3. **Initializing the contract**
+
+   ```solidity
+   constructor(
+       uint256 subscriptionId,
+       address vrfCoordinator,
+   ) VRFConsumerBaseV2Plus(vrfCoordinator) {
+       s_subscriptionId = subscriptionId;
+   }
+   ```
+
+4. **`requestRandomWords function`**
+
+   ```solidity
+   function requestRandomWords() public view returns(uint256 requestId){
+
+        // This will call the oracles network for requestId.
+       VRFV2PlusClient.RandomWordsRequest memory request =  VRFV2PlusClient.RandomWordsRequest({
+               keyHash: i_keyHash,
+               subId: s_subscriptionId,
+               requestConfirmations: requestConfirmations,
+               callbackGasLimit: callbackGasLimit,
+               numWords: numWords,
+               extraArgs: VRFV2PlusClient._argsToBytes(
+                   VRFV2PlusClient.ExtraArgsV1({nativePayment: false})
+               )
+       });
+       requestId = s_vrfCoordinator.requestRandomWords(request);
+       console.log(requestId);
+   }
+   ```
+
+
+5. **`fulfillRandomWords function`**
+
+    ```solidity
+    // The coordinator sends the result of our generated randomWords back to fulfillRandomWords
+    function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) public {
+
+        uint randomNum = (randomWords[0]%arrayLength);
+
+        <!-- Now, implement the functionality you want to use!!! -->
+    }
+    ```
+
+
+
+
+### CHAINLINK AUTOMATION
+
+- To automate some functions in our smart contract,
+    - `checkUpkeep()` checks if enough time has passed to call main logic
+    - `performUpkeep()` main logic which has to be automated!!!!
+  
+
+
+1. **Import the libraries**
+    
+    ```solidity
+    import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
+    ```
+
+
+2. **Initializing state variables**
+
+    ```solidity
+    constructor(uint256 _interval) {
+        interval = _interval;
+        lastTimeStamp = block.timestamp;
+        counter = 0;
+    }
+    ```
+
+
+4. **`checkUpkeep() and performUpkeep()`**
+
+    ```solidity
+    contract Counter is AutomationCompatibleInterface{
+
+    // constructor
+
+    // this function will check if we need to call our logic to call again
+    function checkUpkeep(
+        bytes calldata /* checkData */
+    )
+        external
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
+    }
+
+
+    // Our main logic of function
+    function performUpkeep(bytes calldata /* performData */) external override {
+
+        (bool upkeepNeeded,) = checkUpkeep("");
+        if(!upkeepNeeded){
+            revert();
+        }
+
+        // some condition n logic to increase counter
+        counter = counter + 1;
+    }
+
+
+    }
+    ```
+
 
 
 
@@ -1437,9 +1503,7 @@ function getConversionRate(uint256 ethAmount) public view returns (uint256) {
 }
 ```
 
-**NOTE** : In solidity,  multiply before dividing to get better precision.
-
-
+**NOTE** : In solidity, multiply before dividing to get better precision.
 
 ### CREATING OUR OWN libraries(optional)
 
@@ -1447,7 +1511,7 @@ function getConversionRate(uint256 ethAmount) public view returns (uint256) {
 - Use keyword **library** instead of **contract**.
 
 ```js
-// PriceConverter.sol 
+// PriceConverter.sol
 
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
@@ -1476,14 +1540,11 @@ using PriceConverter for uint256;
 require(msg.value.getConversionRate(123) >= minimumUsd, "didn't send enough ETH");
 ```
 
-
 ### GAS OPTIMIZATION TECHNIQUE
 
 - Using keyword like **constant** and **immutable** can optimize the gas cost.
 
 **NOTE : constant and immutable keyword are used for gas optimization in smart contract**
-
-
 
 ### MODULO OPERATOR
 
@@ -1502,8 +1563,6 @@ function mod2(uint num) public pure  returns (uint){
         return (num%2);
 }
 ```
-
-
 
 ### SENDING ETH FROM SMART CONTRACT TO SPECIFIC ADRRESS
 
@@ -1531,11 +1590,7 @@ uint256 public constant SEND_VALUE = 1_000_000_000_000_000_000;
 uint256 public constant SEND_VALUE = 1000000000000000000;
 ```
 
-
-
-
 ### TRUFFLE ️‍🔥
-
 
 #### INSTALLING TRUFFLE
 
@@ -1546,13 +1601,13 @@ uint256 public constant SEND_VALUE = 1000000000000000000;
 - echo "node_modules" > .gitignore
 - npm i --save @openzeppelin/contracts
 
-
 #### INSTALLING GANACHE
 
 - This initialize the ganache rpc server
+
 ```js
 npm i --global ganache
-ganache 
+ganache
 ```
 
 - **add a network called "ganache" to the truffle-config.js file**
@@ -1560,16 +1615,15 @@ ganache
 ```js
 // ganache-cli opens an RPC listener on Port 8545
 module.exports = {
-    networks: {
-        ganache: {
-            host: "127.0.0.1",     // Localhost (default: none)
-            port: 8545,            // Standard Ethereum port (default: none)
-            network_id: "*",       // Any network (default: none)
-        },
-    }
-}
+  networks: {
+    ganache: {
+      host: "127.0.0.1", // Localhost (default: none)
+      port: 8545, // Standard Ethereum port (default: none)
+      network_id: "*", // Any network (default: none)
+    },
+  },
+};
 ```
-
 
 #### MIGRATION FILE
 
@@ -1579,15 +1633,12 @@ module.exports = {
 // migrations/01-web3-deployment.js
 const Web3 = artifacts.require("Web3");
 
-module.exports = function(deployer,network,accounts){
-    deployer.deploy(Web3, {from:accounts[0]});
-}
+module.exports = function (deployer, network, accounts) {
+  deployer.deploy(Web3, { from: accounts[0] });
+};
 ```
 
 - **artifacts.require** function will scan the contents of the build/contracts folder from json and extract all relevant function from json.
-
-
-
 
 #### TRUFFLE CONSOLE (GANACHE-CLI)
 
@@ -1603,7 +1654,6 @@ truffle console --network ganache
 - Now, inside the console we can interact with our smart contract.
 - **Run "migrate" to redeploy our sc inside console**
 
-
 #### INTERACT WITH SC IN TRUFFLE CONSOLE
 
 ```js
@@ -1617,10 +1667,9 @@ token.name();
 let accounts = await web3.eth.getAccounts();
 await token.publicMint(accounts[0], 0.1 ether);
 ```
+
 - Here **contract instance** will make a call (which you can see in Ganache) and return the output stored in the contract.
-**Note : Truffle will scan the complete build artifacts directory and inject all contracts with their ABI and addresses directly in the console**
-
-
+  **Note : Truffle will scan the complete build artifacts directory and inject all contracts with their ABI and addresses directly in the console**
 
 #### UNIT TESTING IN TRUFFLE (JS)
 
@@ -1637,20 +1686,20 @@ test
 // test/Web3.test.js
 const Web3 = artifacts.require("Web3");
 
-contract("Web3", (accounts)=>{
-    // first test check
-    it("compare the two addresses for transaction" , async ()=>{
-        let token = await Web3.deployed();
-        assert.equal(accounts[0],accounts[1],"Alert!!! Transaction fraud");
-    });
+contract("Web3", (accounts) => {
+  // first test check
+  it("compare the two addresses for transaction", async () => {
+    let token = await Web3.deployed();
+    assert.equal(accounts[0], accounts[1], "Alert!!! Transaction fraud");
+  });
 
-    // second test check
-    it("Testing sample smart contract", async ()=>{
-        let token = await Web3.deployed();
-        let tokenName = await token.name();
-        console.log(tokenName);
-    });
-})
+  // second test check
+  it("Testing sample smart contract", async () => {
+    let token = await Web3.deployed();
+    let tokenName = await token.name();
+    console.log(tokenName);
+  });
+});
 ```
 
 - **Here each it(...) function represents new test, which expects a function as second params and msg as first params**
@@ -1659,23 +1708,16 @@ contract("Web3", (accounts)=>{
 - truffle uses Mocha, here instead of 'describe' we will use 'contract'.
 - Truffle will automatically redeploy the contracts based on the migrations files to offer so called **"clean room testing"**
 
-
-
 #### UNIT TESTING IN TRUFFLE (Solidity)
 
-- You can't choose the account you're sending the TX from in Solidity. 
-- You can't modify anything on the chain. 
+- You can't choose the account you're sending the TX from in Solidity.
+- You can't modify anything on the chain.
 - You can't listen to events.
-
-
-
 
 #### Deploy Smart Contracts to a real Network (HD WALLET PROVIDER/INFURA/ALCHEMY)
 
 - This is the most standard way to deploy sc which is also followed by hardhat and foundary also.
 - Here, We start with Infura to deploy the Smart Contract
-
-
 
 - We sign up with a service(**Infura**) that hosts these blockchain nodes and get access.
 - The first thing we need to do is instruct Truffle to sign a transaction before sending it (using HDWALLET-PROVIDER)
@@ -1691,7 +1733,6 @@ echo ".infura" >> .gitignore
 - **.secret** : Add the secretPhrase from our metamask.
 - **.infura** : Add the infura_project_id from infura dashboard
 - **.etherscan** : To verify our sc on etherscan
- 
 
 - Here, we will not use '.env' because it is not good practice in terms of security.
 - We will use 'fileSystem' to store our key.
@@ -1700,26 +1741,28 @@ echo ".infura" >> .gitignore
 ```js
 //  tailwind-config.js
 const HDWalletProvider = require("@truffle/hdwallet-provider");
-const fs = require('fs');
+const fs = require("fs");
 const mnemonicPhrase = fs.readFileSync(".secret").toString().trim();
 const infuraProjectID = fs.readFileSync(".infura").toString().trim();
 const ETHERSCAN_ID = fs.readFileSync(".etherscan_id").toString().trim();
 
-
 module.exports = {
-    // ...
-    networks:{
-        sepolia: {
-            provider: () => new HDWalletProvider(mnemonicPhrase, `https://sepolia.infura.io/v3/${infuraId}`),
-            network_id: 11155111,  // Sepolia's id
-            confirmations: 2,      // # of confirmations to wait between deployments. (default: 0)
-            timeoutBlocks: 200,    // # of blocks before a deployment times out  (minimum/default: 50)
-            skipDryRun: true       // Skip dry run before migrations? (default: false for public nets)
-      },
-    }
-}
+  // ...
+  networks: {
+    sepolia: {
+      provider: () =>
+        new HDWalletProvider(
+          mnemonicPhrase,
+          `https://sepolia.infura.io/v3/${infuraId}`
+        ),
+      network_id: 11155111, // Sepolia's id
+      confirmations: 2, // # of confirmations to wait between deployments. (default: 0)
+      timeoutBlocks: 200, // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true, // Skip dry run before migrations? (default: false for public nets)
+    },
+  },
+};
 ```
-
 
 - **Deploy our sc on sepolia using migrate**
 
@@ -1729,14 +1772,12 @@ truffle migrate --network sepolia
 truffle console --network sepolia
 ```
 
-
-
-
 #### Deploy Smart Contracts to a real network (Truffle Dashboard and METAMASK)
 
 - We will use MetaMask to do the actual interaction with a blockchain. It's in there for a while, but not used very widely.
 
 - Start with,
+
 ```js
 // This will open an RPC tunnel to a website where MetaMask can connect to
 truffle dashboard
@@ -1744,9 +1785,6 @@ truffle migrate --network dashboard
 ```
 
 - **in this method we are not required to define the network in tailwind-config.js file**
-
-
-
 
 #### Verification of SC on Etherscan
 
@@ -1767,6 +1805,7 @@ module.exports = {
 ```
 
 - Simply, run the following command in terminal
+
 ```js
 // FOR INFURA
 truffle run verify Spacebear --network sepolia
@@ -1775,11 +1814,9 @@ truffle run verify Spacebear --network sepolia
 truffle run verify Spacebear --network dashboard
 ```
 
-
 #### Solidity Optimizer¶
 
 - Reduces the gas needed for contract deployment as well as for external calls made to the contract.
-
 
 ```js
 module.exports = {
@@ -1800,7 +1837,6 @@ module.exports = {
 }
 ```
 
-
 #### FINAL tailwind-config.js
 
 - Most of the time the **tailwind-config.js** will look like:
@@ -1808,34 +1844,36 @@ module.exports = {
 ```js
 // tailwind-config.js
 const HDWalletProvider = require("@truffle/hdwallet-provider");
-const fs = require('fs');
+const fs = require("fs");
 const mnemonicPhrase = fs.readFileSync(".secret").toString().trim();
 const infuraProjectID = fs.readFileSync(".infura").toString().trim();
 
 module.exports = {
-
-    plugins: ['truffle-plugin-verify'],
+  plugins: ["truffle-plugin-verify"],
   api_keys: {
-    etherscan: fs.readFileSync(".etherscan").toString().trim()
+    etherscan: fs.readFileSync(".etherscan").toString().trim(),
   },
 
   networks: {
-
     // GANACHE
-    ganache:{
-      host:"127.0.0.1",
-      port:8545,
-      network_id:"*",
+    ganache: {
+      host: "127.0.0.1",
+      port: 8545,
+      network_id: "*",
     },
     // SEPOLIA
     sepolia: {
-      provider: () => new HDWalletProvider(mnemonicPhrase, `https://sepolia.infura.io/v3/${infuraId}`),
-      network_id: 11155111,  // Sepolia's id
-      confirmations: 2,      // # of confirmations to wait between deployments. (default: 0)
-      timeoutBlocks: 200,    // # of blocks before a deployment times out  (minimum/default: 50)
-      skipDryRun: true       // Skip dry run before migrations? (default: false for public nets)
+      provider: () =>
+        new HDWalletProvider(
+          mnemonicPhrase,
+          `https://sepolia.infura.io/v3/${infuraId}`
+        ),
+      network_id: 11155111, // Sepolia's id
+      confirmations: 2, // # of confirmations to wait between deployments. (default: 0)
+      timeoutBlocks: 200, // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true, // Skip dry run before migrations? (default: false for public nets)
+    },
   },
-},
 
   // Set default mocha options here, use special reporters, etc.
   mocha: {
@@ -1845,31 +1883,30 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.16",      // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.8.16", // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      settings: {          // See the solidity docs for advice about optimization and evmVersion
-       optimizer: {
-         enabled: false,
-         runs: 200
-       },
-      //  evmVersion: "byzantium"
-      }
-    }
+      settings: {
+        // See the solidity docs for advice about optimization and evmVersion
+        optimizer: {
+          enabled: false,
+          runs: 200,
+        },
+        //  evmVersion: "byzantium"
+      },
+    },
   },
 };
-
 ```
-
-
 
 #### Debugging During Smart Contract Development (console.log)
 
 ```js
 npm install @ganache/console.log
 
-// import 
+// import
 import "@ganache/console.log/console.sol";
 ```
+
 - Start using the 'console.log' in your smart contract for debugging.
 
 ```js
@@ -1880,18 +1917,14 @@ migrate
 
 - Try to mint an NFTs and you will see your console.log on the **ganache server**
 
-
-
 #### Debugging already deployed Smart Contracts with Forking (Truffle Debugger)
 
 - There it is, your contract, on Mainnet. But suddenly users are reporting a bug. Something isn't right.
 - because your users funds are at stake, after all...
 
-
 - Now,
-- **Ganache can fork the mainchain** 
+- **Ganache can fork the mainchain**
 - **Truffle can debug smart contracts without even having the source code locally**
-
 
 ```js
 // Pick any recent transaction from Etherscan and check it is verified smart contract.
@@ -1904,6 +1937,7 @@ truffle debug <TXHASH> --network ganache --fetch-external
 - You can get the **TXHASH** from **Web3.json** file in networks object.
 
 <!-- for ganache mainchain forking -->
+
 - can fork mainchain/ testnet
 - ganache downloads the code
 - ganache offers debug-trace transaction rpc call (normal blockchain node do not offers this)
@@ -1911,17 +1945,11 @@ truffle debug <TXHASH> --network ganache --fetch-external
 - Hit return a few times to see the actual execution of the code.
 - Hit h for help and v for the current variables
 
-
-
-
-
-
 ### HARDHAT️‍🔥
 
 - **artifacts** folder in our root directory contains our smart contract abi array.
 - Hardhat comes built-in with Hardhat Network, a local Ethereum network designed for development.
 - It allows you to deploy your contracts, run your tests and debug your code, all within the confines of your local machine
-
 
 #### INSTALLING HARDHAT AND INITIALLIZING PROJECT
 
@@ -1933,7 +1961,6 @@ npm i --save @openzeppelin/contracts
 npm install --save-dev @nomicfoundation/hardhat-toolbox
 ```
 
-
 #### Compiling contracts
 
 - Start by creating a new directory called **contracts** and create a file inside the directory called **Web3.sol**
@@ -1942,26 +1969,24 @@ npm install --save-dev @nomicfoundation/hardhat-toolbox
 npx hardhat compile
 ```
 
-
 #### Testing contracts
 
-**Note : Hardhat will run every *.js file in `test/`**
+**Note : Hardhat will run every \*.js file in `test/`**
 
-- Start the testing using following command : 
+- Start the testing using following command :
+
 ```js
 npx hardhat test
 ```
 
-
 - We will use **Ether.js and Mocha-Chai** for our testing.
 - **Mocha-Chai is popular JavaScript assertion library**
+
 ```js
 // installing ether.js and mocha
 npm install ethers
 npm install --save-dev mocha
 ```
-
-
 
 - Create a new directory called **test** inside our project root directory and create a new file in there called **web3test.js**
 - To test our contract, we are going to use Hardhat Network, a local Ethereum network designed for development.
@@ -1970,59 +1995,57 @@ npm install --save-dev mocha
 //  test/web3test.cjs
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const assert = require('assert');
+const assert = require("assert");
 
 describe("Token contract", function () {
-    // first test check
-    it("Deployment should assign the total supply of tokens to the owner", async function () {
-
-    // RETURNS THE ETHEREUM ACCOUNT. 
+  // first test check
+  it("Deployment should assign the total supply of tokens to the owner", async function () {
+    // RETURNS THE ETHEREUM ACCOUNT.
     // And, this account will execute the deployment
-      const [owner, addr1, addr2] = await ethers.getSigners();
+    const [owner, addr1, addr2] = await ethers.getSigners();
 
-    // start the deployment of our token contract 
+    // start the deployment of our token contract
     // return a Promise that resolves to a Contract
     // This is the contract intance that has a method for each of your smart contract functions.
-      const token = await ethers.deployContract("Web3");
+    const token = await ethers.deployContract("Web3");
 
     // Once contract is deployed, we can call contract methods using contract instance(token).
     // the account in the owner variable executed the deployment,
-      const ownerBalance = await token.balanceOf(owner.address);
+    const ownerBalance = await token.balanceOf(owner.address);
 
     // Here, the token's supply amount and we're checking that it's equal to ownerBalance, as it should be.
     // We have used expect(...) function from Mocha-chai to compare
-      expect(await token.totalSupply()).to.equal(ownerBalance);
+    expect(await token.totalSupply()).to.equal(ownerBalance);
 
     //   either we can use expect(...) method or assert.equal(...) method
-      assert.equal(await toke.totalSupply(), ownerBalance);
-    });
+    assert.equal(await toke.totalSupply(), ownerBalance);
   });
+});
 ```
 
 - Above, we can use either use **expect(...) or assert.equal(...) method**
 
-
 ##### Reusing common test setups with fixtures
 
-- This setup could involve multiple deployments and other transactions. 
-- Doing that in every test means a lot of code duplication. 
+- This setup could involve multiple deployments and other transactions.
+- Doing that in every test means a lot of code duplication.
 - Plus, executing many transactions at the beginning of each test can make the test suite much slower.
-
 
 - To can avoid code duplication and improve the performance of your test suite we can use **fixtures**
 - A fixture is a setup function that is run only the first time it's invoked.
-- On every invocationshardhat will reset the state of networks. 
+- On every invocationshardhat will reset the state of networks.
 
 ```js
-const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+const {
+  loadFixture,
+} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { expect } = require("chai");
-const assert = require('assert');
+const assert = require("assert");
 const { ethers } = require("hardhat");
 
 describe("Token contract", function () {
-
-    // deploy token fixtures
-    async function deployTokenFixture() {
+  // deploy token fixtures
+  async function deployTokenFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
     const token = await ethers.deployContract("Token");
@@ -2032,32 +2055,30 @@ describe("Token contract", function () {
     return { token, owner, addr1, addr2 };
   }
 
-    // first test check
-    it("Deployment should assign the total supply of tokens to the owner", async function () {
+  // first test check
+  it("Deployment should assign the total supply of tokens to the owner", async function () {
     // for every test now we can use fixture instead of redepolying contract.
     const { token, owner } = await loadFixture(deployTokenFixture);
 
     const ownerBalance = await token.balanceOf(owner.address);
     expect(await token.totalSupply()).to.equal(ownerBalance);
     assert.equal(await token.name(), "ERC721");
-    });
-
-    // second test check
-    it("Test function", async function (){
-        const { token, owner } = await loadFixture(deployTokenFixture);
-        // ...rest of code
-    })
   });
+
+  // second test check
+  it("Test function", async function () {
+    const { token, owner } = await loadFixture(deployTokenFixture);
+    // ...rest of code
+  });
+});
 ```
 
 **Note : To know more testing methods read hardhat testing docs (you know!!!)**
-
 
 #### Debugging with Hardhat Network
 
 - For debugging we will use **console.log()** in soilidity similar to JS.
 - you can print logging messages and contract variables from your Solidity code.
-
 
 ```js
 // contract/Web3.sol
@@ -2074,11 +2095,10 @@ contract TestContract {
 
 - Lastly, run **npx hardhat test** to seee the result of debugging in terminal.
 
-
-
 #### Deploying to a live network
 
-- To run  deploy our smart contract use following code:
+- To run deploy our smart contract use following code:
+
 ```js
 // THIS INITITALIZE AN RPC SERVER
 npx hardhat node
@@ -2090,8 +2110,7 @@ npx hardhat ignition deploy ./ignition/modules/deploy.cjs --network localhost
 npx hardhat ignition deploy ./ignition/modules/deploy.cjs --network sepolia
 ```
 
-
-- In Hardhat, deployments are defined through **Ignition Modules.** 
+- In Hardhat, deployments are defined through **Ignition Modules.**
 - Ignition modules are written inside **./ignition/modules directory.**
 
 ```js
@@ -2107,8 +2126,6 @@ const TokenModule = buildModule("TokenModule", (m) => {
 module.exports = TokenModule;
 ```
 
-
-
 - Now to deploy our smart contract we will initialize an RPC server locally in our terminal(port:8545)
 - We need to modify our **hardhat.config.js** file.
 
@@ -2120,7 +2137,6 @@ const { vars } = require("hardhat/config");
 
 // SET YOUR API KEY IN VARS AND NOT IN .ENV
 // npx hardhat vars set API_KEY_NAME
-
 
 const INFURA_API_KEY = vars.get("INFURA_API_KEY");
 const PRIVATE_KEY = vars.get("PRIVATE_KEY");
@@ -2140,12 +2156,9 @@ module.exports = {
     enabled: true,
   },
 };
-
 ```
 
 - Here, we are using **Infura blockchain node provider**
-
-
 
 #### Store your API_KEY
 
@@ -2157,11 +2170,10 @@ npx hardhat vars set API_KEY_NAME
 
 
 // hardhat.config.cjs
-const { vars } = require("hardhat/config"); 
+const { vars } = require("hardhat/config");
 const INFURA_API_KEY = vars.get("INFURA_API_KEY");
 const PRIVATE_KEY = vars.get("PRIVATE_KEY");
 ```
-
 
 #### Verify Smart Contract on etherscan
 
@@ -2171,11 +2183,6 @@ npx hardhat verify --network sepolia DEPLOYED_CONTRACT_ADDRESS
 // 2.
 npx hardhat ignition verify sepolia-deployment
 ```
-
-
-
-
-
 
 ### FOUNDRY AND FORGE️‍ 🔥
 
@@ -2196,7 +2203,7 @@ npx hardhat ignition verify sepolia-deployment
 ```solidity
 // only once
 curl -L https://foundry.paradigm.xyz | bash
-source ~/.bashrc 
+source ~/.bashrc
 foundryup
 // to initialize project
 forge init ProjectName
@@ -2204,7 +2211,7 @@ forge install openzeppelin/openzeppelin-contracts
 ```
 
 **forge** : the build, test, debug, deploy smart contracts
-**anvil** :  the foundry equivalent of Ganache
+**anvil** : the foundry equivalent of Ganache
 **cast** : low level access to smart contracts (a bit of a truffle console equivalent)
 
 #### Compile smart contract
@@ -2234,8 +2241,6 @@ sepolia = { key = "${ETHERSCAN_API_KEY}"}
 uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
 ```
 
-
-
 #### SOLIDITY SCRIPTING
 
 - Written in solidity
@@ -2244,9 +2249,6 @@ uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
 
 - Pass all the constructor params in contract instance.
 - **We will use `HelperConfig.s.sol and Intraction.s.sol` file in our `Deploy.s.sol`**
-
-
-
 
 #### DEPLOYING SMART CONTRACT (COMMMANDS)
 
@@ -2267,47 +2269,42 @@ forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --account <
 forge script script/Deploy.s.sol:MyScript --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVATE_KEY --broadcast --verify -vvvv
 ```
 
-
-
 ##### STORE YOUR PRIVATE KEY IN KEYSTORE (CAST)
 
 - Here, we will not store our private key in dotenv file. Rather, we will store it in **KeyStore** provided by foundry.
 - Once we have stored it in keystore we can used it in any project.
-**Note** : This is useful when we need to submit our private key in an terminal.
+  **Note** : This is useful when we need to submit our private key in an terminal.
 
 ```solidity
 cast wallet import privateKey --interactive
 cast wallet list
 ```
 
-
 ##### DEPLOYING ON TESTNET, ANVIL and ROLLUPS BLOCKCHAIN
 
 - deploy our Smart Contract using Foundry scripts.
 - We will write the deploy code in the **script** folder in solidity.
 
-
-
 **By default, scripts are executed by calling the function named run, our entrypoint.**
 
 ```solidity
-// Just a 
+// Just a
 // script/Deploy.s.sol
 
 import {Script} from "forge-std/Script.sol";
 import {TestContract} from "../src/Web3.sol";
 
 contract MyScript is Script{
-    
+
     // BY DEFAULT forge script EXECUTES THE 'run' FUNCTION DURING DEPLOYMENT
     function setUp() external returns(TestContract){
         // This loads in the private key from our .env file
         uint256 privateKey = vm.envUint("ANVIL_PRIVATE_KEY");
 
         // contract creations made by our main script contract.
-        // private key is passed to instruct to use that key for signing the transactions. 
+        // private key is passed to instruct to use that key for signing the transactions.
         vm.startBroadcast(privateKey);
-        
+
         // If we have constructor then passed the value in the function as params.
         // CREATED A NEW CONTRACT INSTANCE.
         TestContract token = new TestContract("Token Name","ETH", "base_URL");
@@ -2322,15 +2319,12 @@ contract MyScript is Script{
 }
 ```
 
-
-
-
 #### DEPLOY SCRIPT CONTRACT || HELPERCONFIG FILE || INTERACTION FILE
 
-- In  **`HelperConfig.s.sol`** file we will declare all the `params, function and variables` we need to pass in constructor during deployment.
-
+- In **`HelperConfig.s.sol`** file we will declare all the `params, function and variables` we need to pass in constructor during deployment.
 
 **HelperConfig.s.sol**
+
 ```solidity
 contract HelperConfig is Script{
     // ERROR
@@ -2377,7 +2371,7 @@ contract HelperConfig is Script{
     }
 
     // LOCAL CONFIG (Local testing using a Mock contract)
-    // Here, we will write the mock script smart contract on local network  
+    // Here, we will write the mock script smart contract on local network
     function getAnvilETHConfig() public returns(NetworkConfig memory){
         // Check to see if we set an active network config
         if(localNetworkConfig.VRFCoordinator != address(0)){
@@ -2399,10 +2393,8 @@ contract HelperConfig is Script{
 - In `Interaction.s.sol` we will create functions from which our `on-chain data interacts with off-chain data`
 - Example : chainlink VRF, chainlink automation, Data feeds and chainlink functions.
 
-
-
-
 **Interaction.s.sol**
+
 ```solidity
 import {Lottery} from "src/Lottery.sol";
 import {HelperConfig, CodeConstants} from "./HelperConfig.s.sol";
@@ -2447,17 +2439,14 @@ contract AddConsumer is Script{
 }
 ```
 
-
 - This is the basic structure of writing **HelperConfig and Interaction** file.
-
-
 
 **By default, scripts are executed by calling the function named run, our entrypoint.**
 
 - This is the `pattern and best practice` we should followed!!!
 
-
 **Deploy.s.sol**
+
 ```solidity
 import {Contract} from "../src/Contract.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
@@ -2498,8 +2487,6 @@ contract MyScript is Script {
 }
 ```
 
-
-
 **change the .env and foundry.toml file**
 
 ```js
@@ -2524,9 +2511,6 @@ sepolia = "${SEPOLIA_RPC_URL}"
 sepolia = { key = "${ETHERSCAN_API_KEY}" }
 ```
 
-
-
-
 #### INTERACTING WITH SC USING CAST
 
 - After deploying sc we can interact (send/call) the functions using **cast**
@@ -2537,24 +2521,18 @@ cast call <address> "getName()"
 cast to-base 0x7717 dec
 ```
 
-
-
 #### TO USE L2, ROLLUPS BLOCKCHAIN TECH. (EX: ZKSYNC)
 
 ```js
 // to use vanilla-foundry
-foundryup
+foundryup;
 
 // to use L2/ROLLUPS
-foundry-zksync
+foundry - zksync;
 ```
 
 - For L2 and rollups you can refer there docs for more clearance
 - **--zksync** refers that we are running on L2/rollups blockchain
-
-
-
-
 
 #### TESTING IN FOUNDRY
 
@@ -2570,7 +2548,7 @@ foundry-zksync
 3. **FORKED TEST** - TESTING OUR CODE ON A SIMULATED REAL ENVIRONMENT.
 4. **STAGING TEST** - TESTING OUR CODE IN TESTNET/MAINNET. EX:- SEPOLIA, ANVIL LOCAL TESTING
 
-5. **FUZZ TESTING**
+5. **FUZZ TESTING** - identify vulnerabilities in a smart contract by systematically inputting random data values
    - Stateful fuzz
    - stateless fuzz
    - formal verification
@@ -2604,9 +2582,6 @@ forge debug --debug src/Web3.sol:TestContract --sig "function(argu)" "arguValue"
 forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key>
 ```
 
-
-
-
 #### Forge Standard Library
 
 - **Vm.sol**: Up-to-date cheatcodes interface
@@ -2614,58 +2589,63 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 - **Script.sol**: Basic utilities for Solidity scripting
 - **Test.sol**: A superset of DSTest containing standard libraries, a cheatcodes instance (vm), and Hardhat console
 
-
-
 #### Some best practices to followed when writing the tests
 
-1. **`vm.prank(address(0))`** 
+1. **`vm.prank(address(0))`**
+
    - simulate a TNX to be sent from given specific address.
 
-2. **`vm.deal(address(this), 1 ether)`** 
+2. **`vm.deal(address(this), 1 ether)`**
+
    - Used to give the test contract Ether to work with.
 
 3. **`vm.expectRevert()`**
+
    - Agar mera call/send function revert ho gaya, Toh mera test pass ho jayega.
    - Else, test fail ho jayega.
 
-4. **`vm.expectRevert(Contract.CustomError.selector)`**    
+4. **`vm.expectRevert(Contract.CustomError.selector)`**
+
    - import the error from contract with 'selector'
 
 5. **`vm.expectRevert(abi.enocodeSelector(Contract.CustomError.selector, params1, params2))`**
 
 6. **test_FunctionName**
+
    - Functions prefixed with 'test' are run as a test case by forge.
 
-7. **For, testFail** 
-   - A good practice is to use the pattern **test_Revert[If|When]_Condition** in combination with the **expectRevert** cheatcode
+7. **For, testFail**
 
-    ```solidity
-        function test_RevertCannotSubtract43() public {
-            vm.expectRevert(stdError.arithmeticError);
-            testNumber -= 43;
-        }
-    ```
+   - A good practice is to use the pattern **test_Revert[If|When]\_Condition** in combination with the **expectRevert** cheatcode
+
+   ```solidity
+       function test_RevertCannotSubtract43() public {
+           vm.expectRevert(stdError.arithmeticError);
+           testNumber -= 43;
+       }
+   ```
 
 8. **Test functions must have either **external or public** visibility.**
 
-
 9. **type aliases(enum, struct, array,errors,events) can be call using main contract(Lottery) only.**
-    ```solidity
-    function test_GetRaffleState() public view {
-        assert(lottery.getLotteryStatus() == Lottery.LotteryStatus.Open);
-    }
-    ```
+
+   ```solidity
+   function test_GetRaffleState() public view {
+       assert(lottery.getLotteryStatus() == Lottery.LotteryStatus.Open);
+   }
+   ```
+
+10. **functions(call/send) can be called by our instance(lottery)**
 
 
-10.  **functions(call/send) can be called by our instance(lottery)**
     ```solidity
     function test_CheckEntranceFee() public view {
         assertEq(lottery.getEntryFeeAmount(), 0.01 ether);
     }
     ```
 
+11. **To Transfer some value during calling or Transact eth to SC**
 
-11.  **To Transfer some value during calling or Transact eth to SC**
 
     ```solidity
     function test_LotteryCheckIfUserIsAdded() external {
@@ -2675,23 +2655,22 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
         }
     ```
 
+12. **`vm.expectEmit()`** :
 
-12. **`vm.expectEmit()`** : 
-    -  a specific log is emitted during the next call.
+    - a specific log is emitted during the next call.
 
     ```solidity
     function test_LotteryEntranceFeeEvents() external{
         vm.prank(USER);
-        // for indexed params we will set it true 
+        // for indexed params we will set it true
         vm.expectEmit(true, false, false,false , address(lottery));
         emit EnteredUser(USER);
         lottery.enterLottery{value:_entranceFee}();
     }
     ```
 
-
-
 13. **`vm.warp() || vm.roll()`**
+
     - Sets block.timestamp.
     - Sets block.timestamp.
 
@@ -2702,12 +2681,12 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
         vm.warp(block.timestamp + _interval + 1);
         vm.roll(block.timestamp + 1);
     }
-    ``` 
-
+    ```
 
 14. **`vm.recordLogs() || vm.getRecordedLogs()`**
+
     - Tells the VM to start recording all the emitted events.
-    - To access them, use `getRecordedLogs`  
+    - To access them, use `getRecordedLogs`
 
     ```solidity
     function test_GetEventsLogs() public {
@@ -2717,19 +2696,15 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
         bytes32 value = logs[1].topics[1];
         assert(uint256(value) > 0);
     }
-    ``` 
-
-
-
-
+    ```
 
 #### WRITING UNIT/FORK TEST
 
 - For, advance testing we will use `HelperConfig, Contract and Deploy` file.
 - Follow, `Best practices and vm cheatcodes above for advance and better testing`.
 
-
 **Contract.t.sol**
+
 ```solidity
 import {Contract} from "src/Contract.sol";
 import {ContractScript} from "script/Deploy.s.sol";
@@ -2776,17 +2751,12 @@ contract ContractTest is Test {
 }
 ```
 
-
-
-
-
-
 #### Remapping dependencies
 
 - Before running the forge remapping command we need to store the path in **toml**
 
 ```js
-remapping = ['@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts']
+remapping = ["@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts"];
 ```
 
 - **@chainlink/contracts** now is equal to the actual path of contract
@@ -2795,9 +2765,6 @@ remapping = ['@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts']
 // Forge can remap dependencies to make them easier to import. Forge will automatically try to deduce some remappings for you:
 forge remappings
 ```
-
-
-
 
 ### FOUNDRY COVERAGE
 
@@ -2813,9 +2780,6 @@ forge coverage --report lcov
 // This will create a .txt file that will give us the :
 forge coverage --report debug > coverage.txt
 ```
-
-
-
 
 ### FOUNDRY-DEVOPS
 
@@ -2904,7 +2868,7 @@ contract MyContract is ZkSyncChainChecker {
 
 - `skipZkSync`: Skips the function if you are on a zkSync based chain.
 - `onlyZkSync`: Only allows the function if you are on a zkSync based chain.
-  
+
 ### ZkSyncChainChecker Functions
 
 - `isZkSyncChain()`: Returns true if you are on a zkSync based chain.
