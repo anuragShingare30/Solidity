@@ -2025,6 +2025,9 @@ describe("Token contract", function () {
 
 - Above, we can use either use **expect(...) or assert.equal(...) method**
 
+
+
+
 ##### Reusing common test setups with fixtures
 
 - This setup could involve multiple deployments and other transactions.
@@ -2075,6 +2078,10 @@ describe("Token contract", function () {
 
 **Note : To know more testing methods read hardhat testing docs (you know!!!)**
 
+
+
+
+
 #### Debugging with Hardhat Network
 
 - For debugging we will use **console.log()** in soilidity similar to JS.
@@ -2095,6 +2102,9 @@ contract TestContract {
 
 - Lastly, run **npx hardhat test** to seee the result of debugging in terminal.
 
+
+
+
 #### Deploying to a live network
 
 - To run deploy our smart contract use following code:
@@ -2113,12 +2123,19 @@ npx hardhat ignition deploy ./ignition/modules/deploy.cjs --network sepolia
 - In Hardhat, deployments are defined through **Ignition Modules.**
 - Ignition modules are written inside **./ignition/modules directory.**
 
+
+
 ```js
 // ./ignition/modules/deploy.js
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 
 const TokenModule = buildModule("TokenModule", (m) => {
-  const token = m.contract("Web3");
+    // constructor params
+    const entranceFee = 1_000_000_000n; // 0.01 ETH
+    const interval = 30; // 30 seconds
+    const initialOwner = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"; 
+
+    const token = m.contract("Web3",[entranceFee,interval,initialOwner]);
 
   return { token };
 });
@@ -2160,6 +2177,10 @@ module.exports = {
 
 - Here, we are using **Infura blockchain node provider**
 
+
+
+
+
 #### Store your API_KEY
 
 - We will store our API_KEY, private_key and seed-phrase in **var** and not in **.env/.env.local**
@@ -2175,6 +2196,9 @@ const INFURA_API_KEY = vars.get("INFURA_API_KEY");
 const PRIVATE_KEY = vars.get("PRIVATE_KEY");
 ```
 
+
+
+
 #### Verify Smart Contract on etherscan
 
 ```js
@@ -2183,6 +2207,30 @@ npx hardhat verify --network sepolia DEPLOYED_CONTRACT_ADDRESS
 // 2.
 npx hardhat ignition verify sepolia-deployment
 ```
+
+
+
+#### SENDING ETH FROM FRONTEND
+
+- On frontend, `if we need to send ether to contract` :
+
+```js
+await lottery.methods.sendSomeEthToContract().send({
+    from:account,
+    value:web3.utils.toWei('0.001','ether'),
+    gas:"300000",
+    gasPrice:undefined
+});
+```
+
+- Always, the balance is returned in wei(10^18). `To convert in ETH`:
+
+```js
+// this will convert wei -> eth
+const weiToEth = web3.utils.toWei('0.01','ether');
+```
+
+
 
 
 
@@ -2966,3 +3014,54 @@ You must also add `ffi = true` to your `foundry.toml` to use this feature.
 ### FoundryZkSync Functions
 
 - `is_foundry_zksync`: Returns true if you are on `foundry-zksync`
+
+
+
+
+
+
+
+
+### Connect Wallet Btn function
+
+- A simple yet effective connect wallet btn function
+
+```js
+// connect wallet function
+    const {ethereum} = window;
+    const web3 = new Web3(ethereum);
+  const ConnectWallet = async ()=>{
+    try {
+        if(!ethereum){
+            return <h1>Metamask wallet not found!!!</h1>
+        }
+
+        // get chain-id
+        const chainId = await ethereum.request({method:"eth_chainId"});
+        console.log("ChainId:",chainId);
+
+        // check for correct network
+        const sepolia_chain_id = "0xaa36a7"; // 11155111
+        if(chainId != sepolia_chain_id){
+          alert("You are not connected to sepolia!!");
+          return;
+        }
+        setCorrectNet(true);
+
+        // get accounts
+        const accounts = await ethereum.request({method:"eth_requestAccounts"});
+        console.log(accounts[0]);
+        setAccount(accounts[0]);
+        setLoggedIn(true);
+
+        // set function for account changed
+        ethereum.on('accountsChanged', async()=>{
+          const accounts = await web3.eth.getAccounts();
+          setAccount(accounts[0]);
+        })
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+```
