@@ -2,29 +2,32 @@
 
 ### Software and Platform Used!!!
 
-**RPC Provider**
 
+**`RPC Provider`**
 1. Infura RPC provider
 2. Alchemy RPC Provider
 
-**Contracts**
 
+**`Contracts`**
 1. Openzeppllein
-2. Chainlink VRFv2.5
-3. Chainlink automationv2.1
-4. Alchemy contracts
+2. Chainlink DevHub
+    - Chainlink VRFv2.5
+    - Chainlink automationv2.1
+3. Alchemy contracts
+4. Soulmate and brownie-smart-contracts
 
-**wallets and Frameworks**
 
+**`wallets and Frameworks`**
 1. Metamask
 2. Hardhat
 3. Foundry-forge
 4. Web3.js/ethers.js
 
-### Best Practices of smart contract to be followed
 
-**Natspec format**
+### Best Practices of smart contract to be followed:
 
+
+**`Natspec format`**
 ```solidity
 /// @title A simulator for trees
 /// @author Larry A. Gardner
@@ -34,7 +37,8 @@
 /// @param  A Parameters used in function
 ```
 
-**Layout of Contract:**
+**`Layout of Contract:`**
+```solidity
 // version
 // imports
 // errors
@@ -44,8 +48,10 @@
 // Events
 // Modifiers
 // Functions
+```
 
-**Layout of Functions:**
+**`Layout of Functions:`**
+```solidity
 // constructor
 // receive function (if exists)
 // fallback function (if exists)
@@ -55,6 +61,10 @@
 // private
 // internal & private view & pure functions
 // external & public view & pure functions
+```
+
+
+
 
 ### SIMPLE STRUCTURE FOR SOLIDITY SMART CONTRACT.
 
@@ -1026,21 +1036,37 @@ contract setData {
 9. Refund functionality and Refund time period
 10. Testing smart contract on Testnet
 
+
+
+### Ethereum Improvement Proposal (EIP) 
+
+-  a formal suggestion for changes or updates to the Ethereum network.
+- According to `EIP` the token functionality is improved or added.
+- Tokens follows EIP pattern.
+
+
+
 ### TOKENS(ERC-20,721,1155,1155A)
 
 - **Token** is a representation of something in the digital or physical world that resides on the Ethereum blockchain
 - Managed by a smart contract, which is a program on Ethereum, a token can represent just about anything.
 - **It can be fungible(cryptocurrency) and non-fungible(NFT)**
 
+
+
+
 #### ERC-20(Fungible) TOKEN
+
+- **`ERC20` is a smart contract that follows the ERC20 standard created by `EIP`**.
+- And, `keeps track of balances using storage variables in the contract.`
+- ERC-20 tokens are simple smart contract.
+- **`Ex:Chainlink`**
 
 - ERC20 is a standard for **fungible** tokens, which are all identical and interchangeable.
 - For tokens where every unit is the same (like currency).
-
-**EXAMPLE**
-
 - ERC20 is exactly the same as any other ERC20, just like how one dollar is the same as another dollar.
 
+**EXAMPLE**
 ```solidity
 // ERC-20 TOKEN SAMPLE CONTRACT FROM OZ
 contract Web3 is ERC20, Ownable {
@@ -1048,13 +1074,13 @@ contract Web3 is ERC20, Ownable {
         ERC20("Web3", "ERC20")
         Ownable(msg.sender)
     {
-        _mint(msg.sender, 10000 * 10 ** decimals());
+        _mint(msg.sender, 10000 * 10 ** decimals()); // 10000 ether
     }
 
 }
 ```
 
-- A simple ERC20 token sample contract. Here, we can add minting,burning and allowance function further more...
+
 
 #### ERC-721(Non-Fungible) TOKEN
 
@@ -1064,9 +1090,12 @@ contract Web3 is ERC20, Ownable {
 - Each NFT has its own value based on its uniqueness.
 - For unique, one-of-a-kind items (like art or collectibles).
 
-**EXAMPLE**
 
+**`EXAMPLE`**:
 - Think of an NFT for a unique piece of digital artwork. If you have a token representing **DigitalArt#1**, it's unique and can't just be swapped for **DigitalArt#2**
+
+
+
 
 #### ERC-1155(Fungible and Non-Fungible) TOKEN
 
@@ -1227,6 +1256,8 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 }
 ```
 
+
+
 ### LIQUIDITY POOL (moneyjar -> smart contract)
 
 - A liquidity pool on the Ethereum blockchain is like a big **money jar** filled with two types of tokens (ETH AND ERC-20).
@@ -1239,6 +1270,8 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 2. **Trading** : Now, anyone who wants to trade ETH for DAI (or DAI for ETH) can use this smart contract(jar)
 3. **Swapping** : When someone swaps ETH for DAI, the pool takes in ETH and gives out DAI.
 4. **Pricing** : The prices adjust automatically based on how much ETH and DAI are in the jar.
+
+
 
 ### NFT STAKING SMART CONTRACT (ERC-20 AND ERC-721)
 
@@ -1261,6 +1294,9 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 3. **Rewards** : For keeping their NFT staked, users earn rewards like tokens, points.
    depending on the terms of the smart contract and company for which we are building
 4. **Unstaking** : When the lock period ends, users can withdraw their NFT and collect any rewards they earned.
+
+
+
 
 ### L1, L2 AND ROLL-UPS IN ETHEREUM BLOCKCHAIN
 
@@ -1285,6 +1321,10 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 - This reduces the number of transactions Layer 1 has to handle directly.
 
 - **BENEFITS** : Rollups improve scalability even more than regular Layer2s by minimizing amount of data sent to the main chain.
+
+
+
+
 
 ### ORACLE PROBLEMS / SMART CONTRACT CONNECTIVITY PROBLEM
 
