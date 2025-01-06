@@ -1,4 +1,4 @@
-# Solidity Programming Language Guide 😎
+# Solidity Programming Language AND Framework Guide 😎
 
 ### Software and Platform Used!!!
 
@@ -6,7 +6,6 @@
 **`RPC Provider`**
 1. Infura RPC provider
 2. Alchemy RPC Provider
-
 
 **`Contracts`**
 1. Openzeppllein
@@ -16,12 +15,18 @@
 3. Alchemy contracts
 4. Soulmate and brownie-smart-contracts
 
-
 **`wallets and Frameworks`**
 1. Metamask
 2. Hardhat
 3. Foundry-forge
 4. Web3.js/ethers.js
+
+**`File storage`**
+1. IPFS (web/desktop app)
+2. Pinata
+3. svg to base64
+4. Sepolia Opensea
+
 
 
 ### Best Practices of smart contract to be followed:
@@ -63,6 +68,7 @@
 // external & public view & pure functions
 ```
 
+## SOLIIDTY PROGRAMMING CODE SNIPPETS
 
 
 
@@ -837,6 +843,22 @@ function withDrawMoney(address _address) external payable {
 
 - **address(this)** will return the current smart contract address.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### INTRODUCTION TO WEB3.JS
 
 - **Web3.js** is a JavaScript-library that lets us interact with a blockchain node via its RPC interface or Websockets.
@@ -949,22 +971,29 @@ contract setData {
 
 2. **new web3.eth.Contract() -> await myContract.methods.myMethod({from:account[0]}).send()** To update variable or function with params.
 
+
+
+
 ### WORKING OF IPFS(InterPlanetary File Storage) and CID(Content Identifier).
 
 - IPFS is a decentralized P2P distributed file storing protocol.
-- Storing data on blockchain is way expensive. So, the company store their data on **centralized server and cloud providers**
+- Storing data on blockchain is way expensive. So, the company store their data on **`centralized server and cloud providers`**
 - In IPFS, files and other data are stored in a network of nodes.
-- When a file is added to IPFS, it is split into smaller blocks, hashed using hash algorithm (SHA-256).
-- This hash is called as **CID(Content Identifier).**
+- `When a file is added to IPFS, it is split into smaller blocks, coverted to hash using hash algorithm (SHA-256).`
+- This `hash` is called as **`CID(Content Identifier)`**
 - Everytime re-uploading file a new CID is generated.
 - To retrieve data, a user requests it using the hash.
 - IPFS locates the nodes storing the corresponding blocks and downloads them.
 
-#### Location Addressing vs Content Addressing
+
+
+#### Location-Addressing vs Content-Addressing
 
 1. Traditional web uses location-based addressing, where content is accessed by its location on a server (URL).
 
 2. IPFS uses content-based addressing, where content is accessed by a hash of its content. This ensures that as long as the content remains the same, its address does not change.
+
+
 
 #### PINNING SERVICE TO PINNED A NODE.
 
@@ -973,11 +1002,13 @@ contract setData {
 
 ### TYPES OF WEB3 STORAGE.
 
-- **On-chain storage** refers to the practice of storing data directly on the blockchain, leveraging its inherent security features but at the cost of speed and expense.
+- **`On-chain storage`** refers to the practice of storing data directly on the blockchain, leveraging its inherent security features but at the cost of speed and expense.
 
-- **off-chain decentralized storage** involves storing data across a network of decentralized nodes or servers.(IPFS)
+- **`off-chain decentralized storage`** involves storing data across a network of decentralized nodes or servers.**`(IPFS)`**
 
-- **Off-chain private storage solutions** encompass traditional cloud-based and legacy data storage options designed for secure and controlled access.
+- **`Off-chain private storage solutions`** encompass traditional **`cloud-based and legacy data storage`** options designed for secure and controlled access.
+
+
 
 ### NFT METADATA
 
@@ -1009,19 +1040,29 @@ contract setData {
 }
 ```
 
-- We can see our minted and deployed NFT on opensea (Testnet) through Etherscan and also on our Metamask portfolio.
+- We can see our minted and deployed NFT on `opensea (Testnet)` through Etherscan and also on our `Metamask portfolio.`
+
+
 
 ### Fungible and Non-fungible(NFT) token
+
+
 
 1. **Fungible tokens(cryptocurrencies)** : These tokens are identical and can be exchanged for one another with equal value. Think of fungible tokens like currency
 
 - interchangeable, identical in value (e.g., money).
+**Fungible = `Link,Dollar`**
+
+
 
 2. **Non-fungible tokens(NFTs)** : These tokens are unique and cannot be exchanged on a one-to-one basis for something of equal value because each one has its distinct attributes.
 
 - NFTs are often used to represent digital art, collectibles, or unique assets
 - like a serial number or unique content
 - unique, distinct in value (e.g., a rare collectible).
+
+**Non-fungible = `A pokemon card with diff. stats`**
+
 
 ### TOPICS COVERED IN ERC - 721, 1155, 721A (Ethereum Request for Comment)
 
@@ -2250,7 +2291,9 @@ npx hardhat ignition verify sepolia-deployment
 
 
 
-#### SENDING ETH FROM FRONTEND
+
+
+#### SENDING ETH FROM FRONTEND (web3.utils)
 
 - On frontend, `if we need to send ether to contract` :
 
@@ -2267,6 +2310,8 @@ await lottery.methods.sendSomeEthToContract().send({
 
 ```js
 // this will convert wei -> eth
+import Web3 from "web3";
+const web3 = new Web3();
 const weiToEth = web3.utils.toWei('0.01','ether');
 ```
 
@@ -3054,3 +3099,113 @@ You must also add `ffi = true` to your `foundry.toml` to use this feature.
 ### FoundryZkSync Functions
 
 - `is_foundry_zksync`: Returns true if you are on `foundry-zksync`
+
+
+
+### WEB3 FRONTEND CODE SNIPPETS
+
+- It contains some `code snippets for frontend` that are used repeatedly in frontend!!!
+
+
+
+#### CONNECT WALLET BTN FUNCTION (FRONTEND)
+
+
+```js
+'use client';
+import React from 'react'
+import { ConnectWalletBtn } from '../components/ConnectWalletBtn';
+import ToDoList from '../components/ToDoList';
+import { Web3 } from 'web3';
+import address from "../config";
+import abi from "../abi";
+
+
+const Home = () => {
+  const [correctNet, setCorrectNet] = React.useState(false);
+  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [currentAcc, setCurrentAcc] = React.useState('');
+  const [input, setInput] = React.useState('');
+  const [task,setTasks] = React.useState([]);
+  const web3 = new Web3('https://sepolia.infura.io/v3/6e2aaaa2ff0c4e00995a96624cca8e7a');
+
+  // INITIALIZE THE SMART CONTRACT  
+
+  const token = new web3.eth.Contract(abi.abi, address.contractAddress);
+
+  // CONNECT WALLET BTN FUNCTION
+  const ConnectWallet = async ()=>{
+    try {
+      const {ethereum} = window;
+
+      if(!ethereum){
+        console.log("MetaMask not detected!!!");
+        return;
+      }
+      
+      const chainId = await ethereum.request({method:"eth_chainId"});
+      console.log("connected to chain id : ", chainId);
+      
+      const sepoliaChainId = "0xaa36a7";
+      if(chainId != sepoliaChainId){
+          alert("You are not connected to sepolia test network!!!") 
+          setCorrectNet(false);
+          return;
+      }
+      setCorrectNet(true);
+
+      const accounts = await ethereum.request({method:"eth_requestAccounts"});
+      console.log("account address detected : ", accounts[0]);
+      setLoggedIn(true);
+      setCurrentAcc(accounts[0]);
+
+    } catch (error) {
+      console.log(error);
+    }
+  } 
+
+  // ADD TASK FUNCTION
+  const AddTask = async ()=>{
+    try {
+      const {ethereum} = window;
+      if(ethereum){
+          await token.methods.addTask(input).send({from:currentAcc})
+          .then(res=>{
+            setTasks(...task,task);
+            console.log("Task added");
+          })
+          .catch(error =>{
+            console.log(error);
+          })
+      } else{
+        console.log("Eth does not exist");
+        
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return (
+    <div>
+      <div>
+        <h1 className='btn btn-primary m-4'>{currentAcc}</h1>
+        {
+          loggedIn ? <ToDoList setInput={setInput} AddTask={AddTask}></ToDoList> : <ConnectWalletBtn ConnectWallet={ConnectWallet} />
+        }
+      </div>
+    </div>
+  )
+}
+
+export default Home; 
+```
+
+
+
+# on-chain >>> off-chain storage!!! Why???
+# Base64 format for imageURI(svg) and tokenURI(nft metadata)
+# Documenting code
+# vm.readFile() cheatcode!!!
+# abi.encode()
+# deploying on anvil
