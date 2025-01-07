@@ -974,76 +974,6 @@ contract setData {
 
 
 
-### WORKING OF IPFS(InterPlanetary File Storage) and CID(Content Identifier).
-
-- IPFS is a decentralized P2P distributed file storing protocol.
-- Storing data on blockchain is way expensive. So, the company store their data on **`centralized server and cloud providers`**
-- In IPFS, files and other data are stored in a network of nodes.
-- `When a file is added to IPFS, it is split into smaller blocks, coverted to hash using hash algorithm (SHA-256).`
-- This `hash` is called as **`CID(Content Identifier)`**
-- Everytime re-uploading file a new CID is generated.
-- To retrieve data, a user requests it using the hash.
-- IPFS locates the nodes storing the corresponding blocks and downloads them.
-
-
-
-#### Location-Addressing vs Content-Addressing
-
-1. Traditional web uses location-based addressing, where content is accessed by its location on a server (URL).
-
-2. IPFS uses content-based addressing, where content is accessed by a hash of its content. This ensures that as long as the content remains the same, its address does not change.
-
-
-
-#### PINNING SERVICE TO PINNED A NODE.
-
-- If file is not in used in node using garbage collection process, file will be deleted.
-- To prevent from garbage collection process we will use pinning service.
-
-### TYPES OF WEB3 STORAGE.
-
-- **`On-chain storage`** refers to the practice of storing data directly on the blockchain, leveraging its inherent security features but at the cost of speed and expense.
-
-- **`off-chain decentralized storage`** involves storing data across a network of decentralized nodes or servers.**`(IPFS)`**
-
-- **`Off-chain private storage solutions`** encompass traditional **`cloud-based and legacy data storage`** options designed for secure and controlled access.
-
-
-
-### NFT METADATA
-
-- NFT metadata is the sum of all data that describes an NFT, typically including its name, traits, trait rarity, link to the hosted image, total supply, transaction history, and other essential data.
-
-- **NFT MetaData** contains all description for our NFT including image, image_url, description, attributes.
-
-```json
-// NFT-MetaData-Template
-
-{
-  "name": "Cryptodunks #101",
-  "description": "",
-  "image": "ipfs://QmXtHPbZoUNkUwGcZTcqD8TLRtozdxpjReMroioMPEvkSC/0.png",
-  "attributes": [
-    {
-      "trait_type": "language",
-      "value": "JavaScript"
-    },
-    {
-      "trait_type": "OS",
-      "value": "Windows"
-    },
-    {
-      "trait_type": "Token",
-      "value": "ERC-721"
-    }
-  ]
-}
-```
-
-- We can see our minted and deployed NFT on `opensea (Testnet)` through Etherscan and also on our `Metamask portfolio.`
-
-
-
 ### Fungible and Non-fungible(NFT) token
 
 
@@ -2026,6 +1956,157 @@ truffle debug <TXHASH> --network ganache --fetch-external
 - Hit return a few times to see the actual execution of the code.
 - Hit h for help and v for the current variables
 
+
+
+
+
+
+
+
+### Blockchain File Storage
+
+
+
+#### WORKING OF IPFS(InterPlanetary File Storage) and CID(Content Identifier).
+
+- IPFS is a decentralized P2P distributed file storing protocol.
+- Storing data on blockchain is way expensive. So, the company store their data on **`centralized server and cloud providers`**
+- In IPFS, files and other data are stored in a network of nodes.
+- `When a file is added to IPFS, it is split into smaller blocks, coverted to hash using hash algorithm (SHA-256).`
+- This `hash` is called as **`CID(Content Identifier)`**
+- Everytime re-uploading file a new CID is generated.
+- To retrieve data, a user requests it using the hash.
+- IPFS locates the nodes storing the corresponding blocks and downloads them.
+
+
+
+#### Location-Addressing vs Content-Addressing
+
+1. Traditional web uses location-based addressing, where content is accessed by its location on a server (URL).
+
+2. IPFS uses content-based addressing, where content is accessed by a hash of its content. This ensures that as long as the content remains the same, its address does not change.
+
+
+
+#### PINNING SERVICE TO PINNED A NODE.
+
+- If file is not in used in node using garbage collection process, file will be deleted.
+- To prevent from garbage collection process we will use pinning service.
+
+#### TYPES OF WEB3 STORAGE.
+
+1. **`On-chain storage`**: 
+   - refers to the practice of storing data directly on the blockchain, leveraging its inherent security features but at the cost of speed and expense.
+   - **`Base64 encoding`** is best example
+
+2. **`off-chain decentralized storage`** 
+   - involves storing data across a network of decentralized nodes or servers.
+   - **`IPFS,arweave,filecoin`**
+
+3. **`Off-chain private storage solutions`** 
+   - encompass traditional **`cloud-based and legacy data storage`** options designed for secure and controlled access.
+   - **`AWS,azure,GCS`**
+
+
+
+#### NFT METADATA (TokenURI and ImageURI)
+
+- **NFT metadata** -> TokenURI
+- **Hosted NFT image** -> ImageURI
+
+- NFT metadata is the sum of all data that describes an NFT, typically including its name, traits, trait rarity, link to the hosted image, total supply, transaction history, and other essential data.
+
+- **NFT MetaData** contains all description for our NFT including image, image_uri, description, attributes.
+
+```json
+// NFT-MetaData-Template
+
+{
+  "name": "Cryptodunks #101",
+  "description": "",
+  "image": "ipfs://QmXtHPbZoUNkUwGcZTcqD8TLRtozdxpjReMroioMPEvkSC/0.png",
+  "attributes": [
+    {
+      "trait_type": "language",
+      "value": "JavaScript"
+    },
+    {
+      "trait_type": "OS",
+      "value": "Windows"
+    },
+    {
+      "trait_type": "Token",
+      "value": "ERC-721"
+    }
+  ]
+}
+```
+
+- We can see our minted and deployed NFT on `opensea (Testnet)` through Etherscan and also on our `Metamask portfolio.`
+
+
+
+
+### Off-chain and On-chain storage
+
+
+**Off-chain URI Representation**
+ipfs://CID/?filename=NFT.json
+https://ipfs.io/ipfs/CID/?filename=NFT.json
+
+
+**on-chain URI Representation**
+data:application/json;base64,hash
+
+
+
+1. **`off-chain decentralized storage`** :
+   - `IPFS, FileCoin and Arweave` are some off-chain storage solutions.
+   - They do the heavy lifting with respect to *decentralized NFT data storage* by leveraging a ‘community’ of nodes around the world!!!
+    
+   - **NFTMetadata -> Host on IPFS -> Hash/CID -> TokenURI**
+   - We can access the tokenUri in browser by:
+       - https://ipfs.io/ipfs/hash/?filename=NFT.json
+       - ipfs://hash/?filename=NFT.json
+
+
+2. **`On-chain storage`**: 
+    - We can store the files on-chain and it will be more secure but **`storage and expensive`**
+    - The steps to store files on-chain is:
+        - Encode it in `Base64` format
+        - Concatenate  `baseUri + encodedFile`
+
+
+
+3. **`BaseURI and Base64 conversion`**:
+   - Convert directly in terminal
+     **base64 -i image.svg > image.txt**
+
+   - Use the online converter and store it in txt file
+
+   -  Use **`Base64.sol && abi.encodePacked(args)`** this will encode our raw file to Base64
+  
+
+- Use above any method to encode **raw file to base64 format**
+
+- Our toktenURI and ImageURI will look like this after storing them on-chain!!!
+**data:image/svg+xml;base64,vhsdhvyfYFUYFYUFdcg4758....73248YUDTRTRXGHCyucxjc==**
+
+
+
+**BaseURI**
+```bash
+# This is the format of base uri.
+data:<media-type>;base64,
+
+<media-types> : application/json , image/svg+xml , text/plain , video/mp4
+
+data:application/json;base64,
+data:image/svg+xml;base64,
+```
+
+
+
 ### HARDHAT️‍🔥
 
 - **artifacts** folder in our root directory contains our smart contract abi array.
@@ -2772,13 +2853,16 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 
 
 
-#### Some best practices to followed when writing the tests
+
+
+#### Some best practices to follow!!!
 
 1. **`vm.prank(address(0))`** 
    - simulate a TNX to be sent from given specific address.
 
 2. **`vm.deal(address(this), 1 ether)`** 
    - Used to give the test contract Ether to work with.
+   - We also can send Ether to specific address for test!!!
 
 3. **`vm.expectRevert()`**
    - Agar mera call/send function revert ho gaya, Toh mera test pass ho jayega.
@@ -2876,7 +2960,22 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
     ``` 
 
 
-15. **During testing with foundry, keep some point for best practices:**
+15. **`vm.readFile(path)`**
+    - This cheatcode is used for `filesystem manipulation operations`.
+    - We can read different file(svg,json,text).
+
+    **foundry.toml**
+    ```solidity
+    fs_permissions = [{ access = "read", path = "./"}]
+    ``` 
+    **Use vm.readFile(path)**
+    ```solidity
+    string memory SVG = vm.readFile('img/monkey.svg');
+    ```
+
+
+
+16. **During testing with foundry, keep some point for best practices:**
     - Never make a variable public which contain imp. keys.
     - Write `getterFunctions` 
     - Only main contract can call `errors,events,structs,enums,types aliases`
@@ -2963,7 +3062,7 @@ forge remappings
 
 
 
-### FOUNDRY COVERAGE
+#### FOUNDRY COVERAGE
 
 - Displays which parts of your code are covered by tests.
 
@@ -2977,6 +3076,21 @@ forge coverage --report lcov
 // This will create a .txt file that will give us the parts of our contracts cover:
 forge coverage --report debug > coverage.txt
 ```
+
+
+
+### Advanced EVM and Base64 conversion
+
+- a single low-level instruction executed by a blockchain's virtual machine is `opcode`
+
+opcodes
+bytes
+EVM compatible contracts
+low-level interaction and calling
+
+
+
+
 
 
 
@@ -3203,9 +3317,5 @@ export default Home;
 
 
 
-# on-chain >>> off-chain storage!!! Why???
-# Base64 format for imageURI(svg) and tokenURI(nft metadata)
-# Documenting code
-# vm.readFile() cheatcode!!!
+# deploying on anvil using cast 
 # abi.encode()
-# deploying on anvil
