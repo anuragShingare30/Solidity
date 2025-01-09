@@ -3123,6 +3123,14 @@ forge coverage --report debug > coverage.txt
 
 
 
+**Converting SVG string to Base64 using EVM**
+```solidity
+string memory SVG = vm.readFile('img/img.svg');
+string memory SVG_TO_BASE64 = Base64.encode(bytes(string(abi.encodePacked(SVG))));
+```
+
+
+
 
 
 #### Send TNX that call functions with just data field populated (EVM Signature Selector)
