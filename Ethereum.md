@@ -3079,15 +3079,118 @@ forge coverage --report debug > coverage.txt
 
 
 
-### Advanced EVM and Base64 conversion
 
-- a single low-level instruction executed by a blockchain's virtual machine is `opcode`
 
-opcodes
-bytes
-EVM compatible contracts
-low-level interaction and calling
+### Advanced EVM - Opcodes, Calling and low-level instructions
 
+- **The EVM basically represents all the instructions a computer needs to be able to read.**
+- Any language that can compile down to bytecode with these opcodes is considered `EVM compatible`
+
+
+1. **Data in Transactions**:
+    - When we send a transaction, it is `compiled` down to bytecode
+    - The EVM processes this data to determine which function to call and what inputs to provide.
+
+2. **Bytecode**:
+   - When a contract is deployed, it is compiled into `bytecode understood by the EVM.` 
+   - This `bytecode` represents exactly the `low level instructions` to make our contract happen.
+   - This **bytecode consist of opcodes**
+
+3. **Opcodes**:
+   - Each opcode is a 2-character hexadecimal, represents some special instruction
+   - This opcode reader is sometimes abstractly called the `EVM`   
+  
+4. **Encoding Data**:
+    - Now, `ABI encoding will convert data into bytes `
+    - **abi.encodePacked() || abi.encode()**
+
+5. **Decoding data**:
+    - Decoding is the process of taking the raw bytes and reconstructing the original data
+    - **abi.decode()**
+
+
+6. **Low-Level call and staticcall**:
+    1. **`call`** 
+        - How we call functions to change the state variable of the blockchain
+
+    2. **`staticcall`**
+       - This is how (at a low level) we do our "view" or "pure" function calls  
+
+
+
+
+
+#### Send TNX that call functions with just data field populated (EVM Signature Selector)
+
+- In order to call a function using only the data field of call, we need to encode:
+    - function name
+    - parameters we want to add
+
+
+- Now each contract assigns each function it has a **`function ID/Method ID`**:
+    
+    1. **`Function selector`** is the first 4 bytes of the function signature
+    2. **`Function signature`** a string that defines the function name & parameters
+                                `transfer(address,uint256)`
+
+
+
+
+**send TNX by calling a function by populating the data field!!!**:  
+
+- Lets assume, we need to call `transfer(address,uint256)` but by filling the data field
+
+
+1. **`getFunctionSelector`**:
+
+   ```solidity
+    function getSelector() public pure returns (bytes4 selector) {
+        selector = bytes4(keccak256(bytes("transfer(address,uint256)")));
+    }
+   ``` 
+
+
+2. **`call Transfer Function with selector`**:
+    
+   - Will use **`abi.encodeWithSelector(bytes4 selector, args1, args2)`** 
+
+    ```solidity
+    function callTransferData(address _address, uint256 _amount) public returns (bytes4 ,bool) {
+        (bool success, bytes memory data) = address(this).call(
+            abi.encodeWithSelector(getSelector(), _address,_amount)
+        );
+        return (bytes4(data), success);
+    }
+    ```
+
+3. **`call Transfer Function with signature`**:
+
+    - Will use **`abi.encodeWithSignature(string functSignature, args1, args2)`**
+
+    ```solidity
+    function callTransferDataSig(address _address, uint256 _amount) public returns (bytes4 ,bool) {
+        (bool success, bytes memory data) = address(this).call(
+            abi.encodeWithSignature("transfer(address,uint256)", _address,_amount)
+        );
+        return (bytes4(data), success);
+    }
+    ```
+
+
+
+#### Best practices to follow, to check the correct metamask TNX before TNX happens!!!
+
+- The calls we discuss previously all our **`low-level calls`** that our used to omptimize our code.
+
+1. **Check address**
+2. **Check function selector(MethodID/FunctionID)**:
+   - `cast sig "transfer(address,uint256)"` 
+   - This will return the function selector
+
+3. **Decode the call data to check params**:
+   - `cast --calldata-decode "transfer(address,uint256)" HexData` 
+   - This will return the params passed, before TNX
+   - **HexData** will be available in metamask TNX pop-up!!!
 
 
 
@@ -3318,4 +3421,3 @@ export default Home;
 
 
 # deploying on anvil using cast 
-# abi.encode()
