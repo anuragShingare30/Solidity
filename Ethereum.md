@@ -2766,8 +2766,8 @@ runs=256
 
 - After deploying sc we can interact (send/call) the functions using **cast**
 
-```bash
-cast send <contract-address> "functionName(ArgumentType)" "ArgumentValue" --private-key <private_key> --rpc-url <rpc_url>
+```solidity
+cast send <address> "setName(string)" "anurag" --rpc-url <rpc_url> --private-key <private_key>
 cast call <address> "getName()"
 cast to-base 0x7717 dec
 
@@ -3426,3 +3426,4 @@ export default Home;
 
 
 # deploying on anvil using cast 
+# abi.encode()
