@@ -1963,7 +1963,7 @@ truffle debug <TXHASH> --network ganache --fetch-external
 
 
 
-### Blockchain File Storage
+### Blockchain File Storage🔥
 
 
 
@@ -2766,10 +2766,15 @@ runs=256
 
 - After deploying sc we can interact (send/call) the functions using **cast**
 
-```solidity
+```bash
 cast send <address> "setName(string)" "anurag" --rpc-url <rpc_url> --private-key <private_key>
 cast call <address> "getName()"
 cast to-base 0x7717 dec
+
+# returns function selector/functionID/methodID
+cast sig "transfer(address,uint256)"
+# To check params with HEX data before TNX
+cast --calldata-decode "transfer(address,uint256)" HEXData
 ```
 
 
@@ -3081,7 +3086,7 @@ forge coverage --report debug > coverage.txt
 
 
 
-### Advanced EVM - Opcodes, Calling and low-level instructions
+### Advanced EVM - Opcodes, Calling and low-level instructions🔥
 
 - **The EVM basically represents all the instructions a computer needs to be able to read.**
 - Any language that can compile down to bytecode with these opcodes is considered `EVM compatible`
@@ -3198,22 +3203,22 @@ forge coverage --report debug > coverage.txt
 
 
 
-### FOUNDRY-DEVOPS
+### FOUNDRY-DEVOPS🔥
 
-# foundry-devops
+#### foundry-devops
 
 A repo to get the most recent deployment from a given environment in foundry. This way, you can do scripting off previous deployments in solidity.
 
 It will look through your `broadcast` folder at your most recent deployment.
 
-## Features
+#### Features
 
 - Get the most recent deployment of a contract in foundry
 - Checking if you're on a zkSync based chain
 
-# Getting Started
+#### Getting Started
 
-## Installation
+#### Installation
 
 - Update forge-std to use newer FS cheatcodes
 
@@ -3251,9 +3256,9 @@ function interactWithPreviouslyDeployedContracts() public {
 }
 ```
 
-## Usage - zkSync Checker
+#### Usage - zkSync Checker
 
-### Prerequisites
+#### Prerequisites
 
 - [foundry-zksync](https://github.com/matter-labs/foundry-zksync)
   - You'll know you did it right if you can run `foundryup-zksync --help` and you see a response like:
@@ -3267,7 +3272,7 @@ Update or revert to a specific Foundry-zksync version with ease.
 .
 ```
 
-### Usage - ZkSyncChainChecker
+#### Usage - ZkSyncChainChecker
 
 In your contract, you can import and inherit the abstract contract `ZkSyncChainChecker` to check if you are on a zkSync based chain. And add the `skipZkSync` modifier to any function you want to skip if you are on a zkSync based chain.
 
@@ -3281,18 +3286,18 @@ contract MyContract is ZkSyncChainChecker {
   function doStuff() skipZkSync {
 ```
 
-### ZkSyncChainChecker modifiers
+#### ZkSyncChainChecker modifiers
 
 - `skipZkSync`: Skips the function if you are on a zkSync based chain.
 - `onlyZkSync`: Only allows the function if you are on a zkSync based chain.
   
-### ZkSyncChainChecker Functions
+#### ZkSyncChainChecker Functions
 
 - `isZkSyncChain()`: Returns true if you are on a zkSync based chain.
 - `isOnZkSyncPrecompiles()`: Returns true if you are on a zkSync based chain using the precompiles.
 - `isOnZkSyncChainId()`: Returns true if you are on a zkSync based chain using the chainid.
 
-### Usage - FoundryZkSyncChecker
+#### Usage - FoundryZkSyncChecker
 
 In your contract, you can import and inherit the abstract contract `FoundryZkSyncChecker` to check if you are on the `foundry-zksync` fork of `foundry`.
 
@@ -3308,18 +3313,18 @@ contract MyContract is FoundryZkSyncChecker {
 
 You must also add `ffi = true` to your `foundry.toml` to use this feature.
 
-### FoundryZkSync modifiers
+#### FoundryZkSync modifiers
 
 - `onlyFoundryZkSync`: Only allows the function if you are on `foundry-zksync`
 - `onlyVanillaFoundry`: Only allows the function if you are on `foundry`
 
-### FoundryZkSync Functions
+#### FoundryZkSync Functions
 
 - `is_foundry_zksync`: Returns true if you are on `foundry-zksync`
 
 
 
-### WEB3 FRONTEND CODE SNIPPETS
+### WEB3 FRONTEND CODE SNIPPETS🔥
 
 - It contains some `code snippets for frontend` that are used repeatedly in frontend!!!
 
