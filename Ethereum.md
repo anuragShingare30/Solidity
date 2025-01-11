@@ -864,11 +864,53 @@ function withDrawMoney(address _address) external payable {
 - **Web3.js** is a JavaScript-library that lets us interact with a blockchain node via its RPC interface or Websockets.
 - Here, there are **JavaScript functions** to interact with a blockchain node.
 
-#### WEB3 PROVIDERS (WEBSOCKETS PROVIDERS).
+#### WEB3 PROVIDERS
 
-- Web3.js is not sending the requests directly, it abstracts it away into these providers (EIP-6963, EIP-1193).
-- Here, we can have example of metamask which automatically connects with website.
-- Similarly, for **Web3 Providers** lastly it is connecting to the blockchain node.
+- `Providers` are services that are responsible for enabling Web3.js connectivity with the Ethereum network.
+- `Providers` helps us to **querying data, sending transactions, and interacting with smart contracts.**
+
+
+```solidity
+import { Web3 } from 'web3';
+// new web3 instance
+const web3 = new Web3(/* PROVIDER*/);
+await web3.eth.getBlockNumber();
+```
+
+
+**`Providers types`**
+1. **HTTP Provider**: a request-response protocol and does not support persistent connection(not suitable)
+2. **WebSocket Provider**: a persistent connection between a client and a server(suitable)
+3. **IPC Provider**: This offer high-performance local communication and provide a faster alternative to HTTP providers.(suitable)
+
+
+
+**`Provider Origins`**
+1. **Remote Provider**: 
+
+    - Services like `Alchemy,Infura,QuickNode` offer Ethereum node services that can be accessed via HTTP or Websocket.
+    ```solidity
+    import { Web3 } from 'web3';
+    const web3 = new Web3('https://eth-mainnet.alchemyapi.io/v2/your-api-key');
+    ```
+
+
+2. **Injected Provider**: 
+    
+    - Web3.js supports any injected provider that is compliant with `EIP-1193` 
+    - most often a wallet or web browser 
+    ```solidity
+    import { Web3 } from 'web3';
+    const {ethereum} = window;
+    const web3 = new Web3(ethereum);
+    ```
+
+- We mostly have used the `injected and remote providers`
+
+
+
+
+
 
 #### ABI(Application Binary Interface) ARRAY.
 
