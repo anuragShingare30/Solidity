@@ -2126,7 +2126,11 @@ data:application/json;base64,hash
 
    - Use the online converter and store it in txt file
 
-   -  Use **`Base64.sol && abi.encodePacked(args)`** this will encode our raw file to Base64
+   - Use **`Base64.sol && abi.encodePacked(args)`** this will encode our raw file to Base64
+    ```solidity
+    string memory SVG = vm.readFile('img/img.svg');
+    string memory SVG_TO_BASE64 = Base64.encode(bytes(string(abi.encodePacked(SVG))));
+    ```
   
 
 - Use above any method to encode **raw file to base64 format**
@@ -3148,7 +3152,7 @@ forge coverage --report debug > coverage.txt
    - This opcode reader is sometimes abstractly called the `EVM`   
   
 4. **Encoding Data**:
-    - Now, `ABI encoding will convert data into bytes `
+    - Now, `ABI encoding will convert data into bytes`
     - **abi.encodePacked() || abi.encode()**
 
 5. **Decoding data**:
@@ -3159,9 +3163,19 @@ forge coverage --report debug > coverage.txt
 6. **Low-Level call and staticcall**:
     1. **`call`** 
         - How we call functions to change the state variable of the blockchain
+        ```solidity
+        function stateChange(address _address) public {
+            s_state[_address] = 12;
+        }
+        ```
 
     2. **`staticcall`**
        - This is how (at a low level) we do our "view" or "pure" function calls  
+        ```solidity
+        function getState() public view returns(uint256){
+            return s_state;
+        }
+        ```
 
 
 
@@ -3178,11 +3192,11 @@ string memory SVG_TO_BASE64 = Base64.encode(bytes(string(abi.encodePacked(SVG)))
 #### Send TNX that call functions with just data field populated (EVM Signature Selector)
 
 - In order to call a function using only the data field of call, we need to encode:
-    - function name
-    - parameters we want to add
+    1. function name
+    2. parameters we want to add
 
 
-- Now each contract assigns each function it has a **`function ID/Method ID`**:
+- Now each contract assigns each function a **`function ID/Method ID`**:
     
     1. **`Function selector`** is the first 4 bytes of the function signature
     2. **`Function signature`** a string that defines the function name & parameters
@@ -3193,12 +3207,13 @@ string memory SVG_TO_BASE64 = Base64.encode(bytes(string(abi.encodePacked(SVG)))
 
 **send TNX by calling a function by populating the data field!!!**:  
 
-- Lets assume, we need to call `transfer(address,uint256)` but by filling the data field
+- Lets assume, we need to call `transfer(address,uint256)` but by filling the data field!!!
 
 
 1. **`getFunctionSelector`**:
 
    ```solidity
+    // By this method we will get function selector of the calling function.
     function getSelector() public pure returns (bytes4 selector) {
         selector = bytes4(keccak256(bytes("transfer(address,uint256)")));
     }
@@ -3210,6 +3225,7 @@ string memory SVG_TO_BASE64 = Base64.encode(bytes(string(abi.encodePacked(SVG)))
    - Will use **`abi.encodeWithSelector(bytes4 selector, args1, args2)`** 
 
     ```solidity
+    // Here, using EVM cheatcodes we can directly call the transfer() function using data-field
     function callTransferData(address _address, uint256 _amount) public returns (bytes4 ,bool) {
         (bool success, bytes memory data) = address(this).call(
             abi.encodeWithSelector(getSelector(), _address,_amount)
@@ -3223,6 +3239,7 @@ string memory SVG_TO_BASE64 = Base64.encode(bytes(string(abi.encodePacked(SVG)))
     - Will use **`abi.encodeWithSignature(string functSignature, args1, args2)`**
 
     ```solidity
+    // Here, we will not use function selector. Rather, we will use function signature to call our transfer() function by populating data field.
     function callTransferDataSig(address _address, uint256 _amount) public returns (bytes4 ,bool) {
         (bool success, bytes memory data) = address(this).call(
             abi.encodeWithSignature("transfer(address,uint256)", _address,_amount)
