@@ -20,6 +20,7 @@
 2. Hardhat
 3. Foundry-forge
 4. Web3.js/ethers.js
+5. ThirdWeb
 
 **`File storage`**
 1. IPFS (web/desktop app)
@@ -27,6 +28,13 @@
 3. svg to base64
 4. Sepolia Opensea
 
+
+
+### Core Concepts Covered!!!
+
+1. Building `DApps` using (Hardhat/TypeScript/ReactJs/Web3.js)
+2. Developing `ERC-20` token
+3. Developing `ERC-721` NFTs collection
 
 
 ### Best Practices of smart contract to be followed:
@@ -46,8 +54,8 @@
 ```solidity
 // version
 // imports
-// errors
 // interfaces, libraries, contracts
+// errors
 // Type declarations
 // State variables
 // Events
@@ -2188,7 +2196,7 @@ npx hardhat test
 ```
 
 - We will use **Ether.js and Mocha-Chai** for our testing.
-- **Mocha-Chai is popular JavaScript assertion library**
+- **`Mocha-Chai is popular JavaScript assertion library`**
 
 ```js
 // installing ether.js and mocha
@@ -2354,9 +2362,9 @@ module.exports = TokenModule;
 - Now to deploy our smart contract we will initialize an RPC server locally in our terminal(port:8545)
 - We need to modify our **hardhat.config.js** file.
 
-```js
-// hardhat.config.js
 
+**`hardhat.config.js`**
+```js
 require("@nomicfoundation/hardhat-toolbox");
 const { vars } = require("hardhat/config");
 
@@ -2448,7 +2456,7 @@ const weiToEth = web3.utils.toWei('0.01','ether');
 
 ### FOUNDRY AND FORGE️‍ 🔥
 
-- Foundry totally written on solidity.
+- Foundry totally written in solidity.
 
 **Note : dependencies are added as git-submodules and not as npm or nodejs modules**
 
@@ -2468,8 +2476,8 @@ curl -L https://foundry.paradigm.xyz | bash
 source ~/.bashrc 
 foundryup
 // to initialize project
-forge init ProjectName
-forge install openzeppelin/openzeppelin-contracts
+forge init --no-commit
+forge install openzeppelin/openzeppelin-contracts --no-commit
 ```
 
 **forge** : the build, test, debug, deploy smart contracts
@@ -3026,7 +3034,18 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 
 
 
-16. **During testing with foundry, keep some point for best practices:**
+16. **`nonReentrant() modifier`**:
+    - often used to make sure that a function cannot be called again before the current call completes.
+    ```solidity
+    import {ReentrancyGuard } from "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
+
+    function randomFunction() external nonReentrant{
+        // code here...
+    } 
+    ``` 
+
+
+17. **During testing with foundry, keep some point for best practices:**
     - Never make a variable public which contain imp. keys.
     - Write `getterFunctions` 
     - Only main contract can call `errors,events,structs,enums,types aliases`
@@ -3548,7 +3567,7 @@ export default Home;
 
 **Stablecoins is a cryptocurrencies whose buying power remains stable!!!**
 
-- `Stablecoins` are usually tied to the value of something stable, like a national currency (US Dollar) or commodity(gold)
+- `Stablecoins` are usually tied to the value of something stable, like a national currency (US Dollar) or commodity(gold).
 - For ex, Bitcoin or Ethereum, which are not Stablecoins, whose prices can change drastically. 
 
 **EX:** (1 USDC == 1 USD)
