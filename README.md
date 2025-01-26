@@ -1,30 +1,46 @@
-# Solidity Programming Language Guide 😎
+# Solidity Programming Language AND Framework Guide 😎
 
 ### Software and Platform Used!!!
 
-**RPC Provider**
 
+**`RPC Provider`**
 1. Infura RPC provider
 2. Alchemy RPC Provider
 
-**Contracts**
-
+**`Contracts`**
 1. Openzeppllein
-2. Chainlink VRFv2.5
-3. Chainlink automationv2.1
-4. Alchemy contracts
+2. Chainlink DevHub
+    - Chainlink VRFv2.5
+    - Chainlink automationv2.1
+3. Alchemy contracts
+4. Soulmate and brownie-smart-contracts
 
-**wallets and Frameworks**
-
+**`wallets and Frameworks`**
 1. Metamask
 2. Hardhat
 3. Foundry-forge
 4. Web3.js/ethers.js
+5. ThirdWeb
 
-### Best Practices of smart contract to be followed
+**`File storage`**
+1. IPFS (web/desktop app)
+2. Pinata
+3. svg to base64
+4. Sepolia Opensea
 
-**Natspec format**
 
+
+### Core Concepts Covered!!!
+
+1. Building `DApps` using (Hardhat/TypeScript/ReactJs/Web3.js)
+2. Developing `ERC-20` token
+3. Developing `ERC-721` NFTs collection
+
+
+### Best Practices of smart contract to be followed:
+
+
+**`Natspec format`**
 ```solidity
 /// @title A simulator for trees
 /// @author Larry A. Gardner
@@ -34,18 +50,21 @@
 /// @param  A Parameters used in function
 ```
 
-**Layout of Contract:**
+**`Layout of Contract:`**
+```solidity
 // version
 // imports
-// errors
 // interfaces, libraries, contracts
+// errors
 // Type declarations
 // State variables
 // Events
 // Modifiers
 // Functions
+```
 
-**Layout of Functions:**
+**`Layout of Functions:`**
+```solidity
 // constructor
 // receive function (if exists)
 // fallback function (if exists)
@@ -55,6 +74,11 @@
 // private
 // internal & private view & pure functions
 // external & public view & pure functions
+```
+
+## SOLIIDTY PROGRAMMING CODE SNIPPETS
+
+
 
 ### SIMPLE STRUCTURE FOR SOLIDITY SMART CONTRACT.
 
@@ -827,16 +851,74 @@ function withDrawMoney(address _address) external payable {
 
 - **address(this)** will return the current smart contract address.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### INTRODUCTION TO WEB3.JS
 
 - **Web3.js** is a JavaScript-library that lets us interact with a blockchain node via its RPC interface or Websockets.
 - Here, there are **JavaScript functions** to interact with a blockchain node.
 
-#### WEB3 PROVIDERS (WEBSOCKETS PROVIDERS).
+#### WEB3 PROVIDERS
 
-- Web3.js is not sending the requests directly, it abstracts it away into these providers (EIP-6963, EIP-1193).
-- Here, we can have example of metamask which automatically connects with website.
-- Similarly, for **Web3 Providers** lastly it is connecting to the blockchain node.
+- `Providers` are services that are responsible for enabling Web3.js connectivity with the Ethereum network.
+- `Providers` helps us to **querying data, sending transactions, and interacting with smart contracts.**
+
+
+```solidity
+import { Web3 } from 'web3';
+// new web3 instance
+const web3 = new Web3(/* PROVIDER*/);
+await web3.eth.getBlockNumber();
+```
+
+
+**`Providers types`**
+1. **HTTP Provider**: a request-response protocol and does not support persistent connection(not suitable)
+2. **WebSocket Provider**: a persistent connection between a client and a server(suitable)
+3. **IPC Provider**: This offer high-performance local communication and provide a faster alternative to HTTP providers.(suitable)
+
+
+
+**`Provider Origins`**
+1. **Remote Provider**: 
+
+    - Services like `Alchemy,Infura,QuickNode` offer Ethereum node services that can be accessed via HTTP or Websocket.
+    ```solidity
+    import { Web3 } from 'web3';
+    const web3 = new Web3('https://eth-mainnet.alchemyapi.io/v2/your-api-key');
+    ```
+
+
+2. **Injected Provider**: 
+    
+    - Web3.js supports any injected provider that is compliant with `EIP-1193` 
+    - most often a wallet or web browser 
+    ```solidity
+    import { Web3 } from 'web3';
+    const {ethereum} = window;
+    const web3 = new Web3(ethereum);
+    ```
+
+- We mostly have used the `injected and remote providers`
+
+
+
+
+
 
 #### ABI(Application Binary Interface) ARRAY.
 
@@ -939,79 +1021,28 @@ contract setData {
 
 2. **new web3.eth.Contract() -> await myContract.methods.myMethod({from:account[0]}).send()** To update variable or function with params.
 
-### WORKING OF IPFS(InterPlanetary File Storage) and CID(Content Identifier).
 
-- IPFS is a decentralized P2P distributed file storing protocol.
-- Storing data on blockchain is way expensive. So, the company store their data on **centralized server and cloud providers**
-- In IPFS, files and other data are stored in a network of nodes.
-- When a file is added to IPFS, it is split into smaller blocks, hashed using hash algorithm (SHA-256).
-- This hash is called as **CID(Content Identifier).**
-- Everytime re-uploading file a new CID is generated.
-- To retrieve data, a user requests it using the hash.
-- IPFS locates the nodes storing the corresponding blocks and downloads them.
 
-#### Location Addressing vs Content Addressing
-
-1. Traditional web uses location-based addressing, where content is accessed by its location on a server (URL).
-
-2. IPFS uses content-based addressing, where content is accessed by a hash of its content. This ensures that as long as the content remains the same, its address does not change.
-
-#### PINNING SERVICE TO PINNED A NODE.
-
-- If file is not in used in node using garbage collection process, file will be deleted.
-- To prevent from garbage collection process we will use pinning service.
-
-### TYPES OF WEB3 STORAGE.
-
-- **On-chain storage** refers to the practice of storing data directly on the blockchain, leveraging its inherent security features but at the cost of speed and expense.
-
-- **off-chain decentralized storage** involves storing data across a network of decentralized nodes or servers.(IPFS)
-
-- **Off-chain private storage solutions** encompass traditional cloud-based and legacy data storage options designed for secure and controlled access.
-
-### NFT METADATA
-
-- NFT metadata is the sum of all data that describes an NFT, typically including its name, traits, trait rarity, link to the hosted image, total supply, transaction history, and other essential data.
-
-- **NFT MetaData** contains all description for our NFT including image, image_url, description, attributes.
-
-```json
-// NFT-MetaData-Template
-
-{
-  "name": "Cryptodunks #101",
-  "description": "",
-  "image": "ipfs://QmXtHPbZoUNkUwGcZTcqD8TLRtozdxpjReMroioMPEvkSC/0.png",
-  "attributes": [
-    {
-      "trait_type": "language",
-      "value": "JavaScript"
-    },
-    {
-      "trait_type": "OS",
-      "value": "Windows"
-    },
-    {
-      "trait_type": "Token",
-      "value": "ERC-721"
-    }
-  ]
-}
-```
-
-- We can see our minted and deployed NFT on opensea (Testnet) through Etherscan and also on our Metamask portfolio.
 
 ### Fungible and Non-fungible(NFT) token
+
+
 
 1. **Fungible tokens(cryptocurrencies)** : These tokens are identical and can be exchanged for one another with equal value. Think of fungible tokens like currency
 
 - interchangeable, identical in value (e.g., money).
+**Fungible = `Link,Dollar`**
+
+
 
 2. **Non-fungible tokens(NFTs)** : These tokens are unique and cannot be exchanged on a one-to-one basis for something of equal value because each one has its distinct attributes.
 
 - NFTs are often used to represent digital art, collectibles, or unique assets
 - like a serial number or unique content
 - unique, distinct in value (e.g., a rare collectible).
+
+**Non-fungible = `A pokemon card with diff. stats`**
+
 
 ### TOPICS COVERED IN ERC - 721, 1155, 721A (Ethereum Request for Comment)
 
@@ -1026,21 +1057,37 @@ contract setData {
 9. Refund functionality and Refund time period
 10. Testing smart contract on Testnet
 
+
+
+### Ethereum Improvement Proposal (EIP) 
+
+-  a formal suggestion for changes or updates to the Ethereum network.
+- According to `EIP` the token functionality is improved or added.
+- Tokens follows EIP pattern.
+
+
+
 ### TOKENS(ERC-20,721,1155,1155A)
 
 - **Token** is a representation of something in the digital or physical world that resides on the Ethereum blockchain
 - Managed by a smart contract, which is a program on Ethereum, a token can represent just about anything.
 - **It can be fungible(cryptocurrency) and non-fungible(NFT)**
 
+
+
+
 #### ERC-20(Fungible) TOKEN
+
+- **`ERC20` is a smart contract that follows the ERC20 standard created by `EIP`**.
+- And, `keeps track of balances using storage variables in the contract.`
+- ERC-20 tokens are simple smart contract.
+- **`Ex:Chainlink`**
 
 - ERC20 is a standard for **fungible** tokens, which are all identical and interchangeable.
 - For tokens where every unit is the same (like currency).
-
-**EXAMPLE**
-
 - ERC20 is exactly the same as any other ERC20, just like how one dollar is the same as another dollar.
 
+**EXAMPLE**
 ```solidity
 // ERC-20 TOKEN SAMPLE CONTRACT FROM OZ
 contract Web3 is ERC20, Ownable {
@@ -1048,13 +1095,13 @@ contract Web3 is ERC20, Ownable {
         ERC20("Web3", "ERC20")
         Ownable(msg.sender)
     {
-        _mint(msg.sender, 10000 * 10 ** decimals());
+        _mint(msg.sender, 10000 * 10 ** decimals()); // 10000 ether
     }
 
 }
 ```
 
-- A simple ERC20 token sample contract. Here, we can add minting,burning and allowance function further more...
+
 
 #### ERC-721(Non-Fungible) TOKEN
 
@@ -1064,9 +1111,12 @@ contract Web3 is ERC20, Ownable {
 - Each NFT has its own value based on its uniqueness.
 - For unique, one-of-a-kind items (like art or collectibles).
 
-**EXAMPLE**
 
+**`EXAMPLE`**:
 - Think of an NFT for a unique piece of digital artwork. If you have a token representing **DigitalArt#1**, it's unique and can't just be swapped for **DigitalArt#2**
+
+
+
 
 #### ERC-1155(Fungible and Non-Fungible) TOKEN
 
@@ -1227,6 +1277,8 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 }
 ```
 
+
+
 ### LIQUIDITY POOL (moneyjar -> smart contract)
 
 - A liquidity pool on the Ethereum blockchain is like a big **money jar** filled with two types of tokens (ETH AND ERC-20).
@@ -1239,6 +1291,8 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 2. **Trading** : Now, anyone who wants to trade ETH for DAI (or DAI for ETH) can use this smart contract(jar)
 3. **Swapping** : When someone swaps ETH for DAI, the pool takes in ETH and gives out DAI.
 4. **Pricing** : The prices adjust automatically based on how much ETH and DAI are in the jar.
+
+
 
 ### NFT STAKING SMART CONTRACT (ERC-20 AND ERC-721)
 
@@ -1261,6 +1315,9 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 3. **Rewards** : For keeping their NFT staked, users earn rewards like tokens, points.
    depending on the terms of the smart contract and company for which we are building
 4. **Unstaking** : When the lock period ends, users can withdraw their NFT and collect any rewards they earned.
+
+
+
 
 ### L1, L2 AND ROLL-UPS IN ETHEREUM BLOCKCHAIN
 
@@ -1286,6 +1343,10 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 
 - **BENEFITS** : Rollups improve scalability even more than regular Layer2s by minimizing amount of data sent to the main chain.
 
+
+
+
+
 ### ORACLE PROBLEMS / SMART CONTRACT CONNECTIVITY PROBLEM
 
 - The **Oracle problems** refers to the connectivity issue of smart contract with the off-chain data(such as market-data, api_calls, api-data) with on-chain data.
@@ -1310,7 +1371,7 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 2. **CHAINLINK VRF**
 3. **CHAINLINK AUTOMATION**
 4. **END-TO-END RELIABILITY(TAKE INPUT, RETURN OUTPUT)**
-
+5. **Chainlink DATA Feeds**
 
 
 
@@ -1417,7 +1478,7 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 
 
 
-### CHAINLINK AUTOMATION
+#### CHAINLINK AUTOMATION
 
 - To automate some functions in our smart contract,
     - `checkUpkeep()` checks if enough time has passed to call main logic
@@ -1481,29 +1542,49 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 
 
 
+#### CHAINLINK DATA FEEDS
 
+- To get the real time data for assets,currency coversion. We can use chainlink data feeds.
 
-### MATH CONVERSIONS IN SOLIDITY
-
-- Converting the value of ETH to USD
-- As prog. language it does not **support floating point number**
-
-```js
+**Getting the latest price of ETH in USD**
+```solidity
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-function getPrice() internal view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
-        (int256 answer) = priceFeed.latestRoundData();
-        return uint256(answer * 10000000000);
-}
-function getConversionRate(uint256 ethAmount) public view returns (uint256) {
-    // getPrice() function will return current eth price in usd.
-    uint256 ethPrice = getPrice();
-    uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
-    return ethAmountInUsd;
+
+contract DataConsumerV3 {
+    AggregatorV3Interface internal dataFeed;
+    /**
+     * Network: Sepolia
+     * Aggregator: BTC/USD
+     * Address: 0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43
+     */
+    constructor() {
+        dataFeed = AggregatorV3Interface(
+            0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43
+        );
+    }
+
+    function getChainlinkDataFeedLatestAnswer() public view returns (int) {
+        (,int price,,) = dataFeed.latestRoundData();
+        return answer;
+    }
+
+    function getValueInUsd() public view returns(uint256 usdValue){
+        int price = getChainlinkDataFeedLatestAnswer();
+        uint256 private constant PRICE_FEED_SCALE_FACTOR = 1e10;
+        uint256 private constant TOKEN_DECIMAL_STANDARD = 1e18;
+        uint256 public amount = 1;
+
+        // (price * 1e10 * 1)/1e18 == price/1e8 == $3425.781919...
+        usdValue = (uint256(price) * PRICE_FEED_SCALE_FACTOR * amount) / TOKEN_DECIMAL_STANDARD;
+    }
 }
 ```
 
-**NOTE** : In solidity, multiply before dividing to get better precision.
+
+**NOTE** : In solidity, multiply has more preference than division.
+
+
+
 
 ### CREATING OUR OWN libraries(optional)
 
@@ -1945,6 +2026,161 @@ truffle debug <TXHASH> --network ganache --fetch-external
 - Hit return a few times to see the actual execution of the code.
 - Hit h for help and v for the current variables
 
+
+
+
+
+
+
+
+### Blockchain File Storage🔥
+
+
+
+#### WORKING OF IPFS(InterPlanetary File Storage) and CID(Content Identifier).
+
+- IPFS is a decentralized P2P distributed file storing protocol.
+- Storing data on blockchain is way expensive. So, the company store their data on **`centralized server and cloud providers`**
+- In IPFS, files and other data are stored in a network of nodes.
+- `When a file is added to IPFS, it is split into smaller blocks, coverted to hash using hash algorithm (SHA-256).`
+- This `hash` is called as **`CID(Content Identifier)`**
+- Everytime re-uploading file a new CID is generated.
+- To retrieve data, a user requests it using the hash.
+- IPFS locates the nodes storing the corresponding blocks and downloads them.
+
+
+
+#### Location-Addressing vs Content-Addressing
+
+1. Traditional web uses location-based addressing, where content is accessed by its location on a server (URL).
+
+2. IPFS uses content-based addressing, where content is accessed by a hash of its content. This ensures that as long as the content remains the same, its address does not change.
+
+
+
+#### PINNING SERVICE TO PINNED A NODE.
+
+- If file is not in used in node using garbage collection process, file will be deleted.
+- To prevent from garbage collection process we will use pinning service.
+
+#### TYPES OF WEB3 STORAGE.
+
+1. **`On-chain storage`**: 
+   - refers to the practice of storing data directly on the blockchain, leveraging its inherent security features but at the cost of speed and expense.
+   - **`Base64 encoding`** is best example
+
+2. **`off-chain decentralized storage`** 
+   - involves storing data across a network of decentralized nodes or servers.
+   - **`IPFS,arweave,filecoin`**
+
+3. **`Off-chain private storage solutions`** 
+   - encompass traditional **`cloud-based and legacy data storage`** options designed for secure and controlled access.
+   - **`AWS,azure,GCS`**
+
+
+
+#### NFT METADATA (TokenURI and ImageURI)
+
+- **NFT metadata** -> TokenURI
+- **Hosted NFT image** -> ImageURI
+
+- NFT metadata is the sum of all data that describes an NFT, typically including its name, traits, trait rarity, link to the hosted image, total supply, transaction history, and other essential data.
+
+- **NFT MetaData** contains all description for our NFT including image, image_uri, description, attributes.
+
+```json
+// NFT-MetaData-Template
+
+{
+  "name": "Cryptodunks #101",
+  "description": "",
+  "image": "ipfs://QmXtHPbZoUNkUwGcZTcqD8TLRtozdxpjReMroioMPEvkSC/0.png",
+  "attributes": [
+    {
+      "trait_type": "language",
+      "value": "JavaScript"
+    },
+    {
+      "trait_type": "OS",
+      "value": "Windows"
+    },
+    {
+      "trait_type": "Token",
+      "value": "ERC-721"
+    }
+  ]
+}
+```
+
+- We can see our minted and deployed NFT on `opensea (Testnet)` through Etherscan and also on our `Metamask portfolio.`
+
+
+
+
+### Off-chain and On-chain storage
+
+
+**Off-chain URI Representation**
+ipfs://CID/?filename=NFT.json
+https://ipfs.io/ipfs/CID/?filename=NFT.json
+
+
+**on-chain URI Representation**
+data:application/json;base64,hash
+
+
+
+1. **`off-chain decentralized storage`** :
+   - `IPFS, FileCoin and Arweave` are some off-chain storage solutions.
+   - They do the heavy lifting with respect to *decentralized NFT data storage* by leveraging a ‘community’ of nodes around the world!!!
+    
+   - **NFTMetadata -> Host on IPFS -> Hash/CID -> TokenURI**
+   - We can access the tokenUri in browser by:
+       - https://ipfs.io/ipfs/hash/?filename=NFT.json
+       - ipfs://hash/?filename=NFT.json
+
+
+2. **`On-chain storage`**: 
+    - We can store the files on-chain and it will be more secure but **`storage and expensive`**
+    - The steps to store files on-chain is:
+        - Encode it in `Base64` format
+        - Concatenate  `baseUri + encodedFile`
+
+
+
+3. **`BaseURI and Base64 conversion`**:
+   - Convert directly in terminal
+     **base64 -i image.svg > image.txt**
+
+   - Use the online converter and store it in txt file
+
+   - Use **`Base64.sol && abi.encodePacked(args)`** this will encode our raw file to Base64
+    ```solidity
+    string memory SVG = vm.readFile('img/img.svg');
+    string memory SVG_TO_BASE64 = Base64.encode(bytes(string(abi.encodePacked(SVG))));
+    ```
+  
+
+- Use above any method to encode **raw file to base64 format**
+
+- Our toktenURI and ImageURI will look like this after storing them on-chain!!!
+**data:image/svg+xml;base64,vhsdhvyfYFUYFYUFdcg4758....73248YUDTRTRXGHCyucxjc==**
+
+
+
+**BaseURI**
+```bash
+# This is the format of base uri.
+data:<media-type>;base64,
+
+<media-types> : application/json , image/svg+xml , text/plain , video/mp4
+
+data:application/json;base64,
+data:image/svg+xml;base64,
+```
+
+
+
 ### HARDHAT️‍🔥
 
 - **artifacts** folder in our root directory contains our smart contract abi array.
@@ -1980,7 +2216,7 @@ npx hardhat test
 ```
 
 - We will use **Ether.js and Mocha-Chai** for our testing.
-- **Mocha-Chai is popular JavaScript assertion library**
+- **`Mocha-Chai is popular JavaScript assertion library`**
 
 ```js
 // installing ether.js and mocha
@@ -2146,9 +2382,9 @@ module.exports = TokenModule;
 - Now to deploy our smart contract we will initialize an RPC server locally in our terminal(port:8545)
 - We need to modify our **hardhat.config.js** file.
 
-```js
-// hardhat.config.js
 
+**`hardhat.config.js`**
+```js
 require("@nomicfoundation/hardhat-toolbox");
 const { vars } = require("hardhat/config");
 
@@ -2210,7 +2446,9 @@ npx hardhat ignition verify sepolia-deployment
 
 
 
-#### SENDING ETH FROM FRONTEND
+
+
+#### SENDING ETH FROM FRONTEND (web3.utils)
 
 - On frontend, `if we need to send ether to contract` :
 
@@ -2227,6 +2465,8 @@ await lottery.methods.sendSomeEthToContract().send({
 
 ```js
 // this will convert wei -> eth
+import Web3 from "web3";
+const web3 = new Web3();
 const weiToEth = web3.utils.toWei('0.01','ether');
 ```
 
@@ -2236,7 +2476,7 @@ const weiToEth = web3.utils.toWei('0.01','ether');
 
 ### FOUNDRY AND FORGE️‍ 🔥
 
-- Foundry totally written on solidity.
+- Foundry totally written in solidity.
 
 **Note : dependencies are added as git-submodules and not as npm or nodejs modules**
 
@@ -2256,8 +2496,8 @@ curl -L https://foundry.paradigm.xyz | bash
 source ~/.bashrc 
 foundryup
 // to initialize project
-forge init ProjectName
-forge install openzeppelin/openzeppelin-contracts
+forge init --no-commit
+forge install openzeppelin/openzeppelin-contracts --no-commit
 ```
 
 **forge** : the build, test, debug, deploy smart contracts
@@ -2604,6 +2844,11 @@ runs=256
 cast send <address> "setName(string)" "anurag" --rpc-url <rpc_url> --private-key <private_key>
 cast call <address> "getName()"
 cast to-base 0x7717 dec
+
+# returns function selector/functionID/methodID
+cast sig "transfer(address,uint256)"
+# To check params with HEX data before TNX
+cast --calldata-decode "transfer(address,uint256)" HEXData
 ```
 
 
@@ -2687,13 +2932,16 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 
 
 
-#### Some best practices to followed when writing the tests
 
-1. **`vm.prank(address(0))`** 
+
+#### Some best practices to follow!!!
+
+1. **`vm.prank(address(1))`** 
    - simulate a TNX to be sent from given specific address.
 
 2. **`vm.deal(address(this), 1 ether)`** 
    - Used to give the test contract Ether to work with.
+   - We also can send Ether to specific address for test!!!
 
 3. **`vm.expectRevert()`**
    - Agar mera call/send function revert ho gaya, Toh mera test pass ho jayega.
@@ -2791,12 +3039,62 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
     ``` 
 
 
-15. **During testing with foundry, keep some point for best practices:**
+15. **`vm.readFile(path)`**
+    - This cheatcode is used for `filesystem manipulation operations`.
+    - We can read different file(svg,json,text).
+
+    **foundry.toml**
+    ```solidity
+    fs_permissions = [{ access = "read", path = "./"}]
+    ``` 
+    **Use vm.readFile(path)**
+    ```solidity
+    string memory SVG = vm.readFile('img/monkey.svg');
+    ```
+
+
+
+16. **`nonReentrant() modifier`**:
+    - often used to make sure that a function cannot be called again before the current call completes.
+    ```solidity
+    import {ReentrancyGuard } from "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
+
+    function randomFunction() external nonReentrant{
+        // code here...
+    } 
+    ``` 
+
+17. **`transfer() and transferFrom()`**:
+    - `transfer()` we use this when we send transaction to ourself.
+    - `transferFrom()` we use this function when we want to send transaction to another account.
+
+  
+
+18. **During testing with foundry, keep some point for best practices:**
     - Never make a variable public which contain imp. keys.
     - Write `getterFunctions` 
     - Only main contract can call `errors,events,structs,enums,types aliases`
     - Contract instance can call/send `getter n write functions`
     - continue...
+
+
+
+
+#### Some Important testing methods.
+
+
+1. **Testing the constructor params**:
+    - To test whether the constructor params are passed correctly or not:
+    ```solidity
+    function test_ConstructorParams() public {
+        // create new contract instance
+        vm.expectRevert();
+        new Contract(params1,params2,params3);
+    }
+    ``` 
+
+
+
 
 
 
@@ -2878,7 +3176,7 @@ forge remappings
 
 
 
-### FOUNDRY COVERAGE
+#### FOUNDRY COVERAGE
 
 - Displays which parts of your code are covered by tests.
 
@@ -2896,22 +3194,161 @@ forge coverage --report debug > coverage.txt
 
 
 
-### FOUNDRY-DEVOPS
 
-# foundry-devops
+### Advanced EVM - Opcodes, Calling and low-level instructions🔥
+
+- **The EVM basically represents all the instructions a computer needs to be able to read.**
+- Any language that can compile down to bytecode with these opcodes is considered `EVM compatible`
+
+
+1. **Data in Transactions**:
+    - When we send a transaction, it is `compiled` down to bytecode
+    - The EVM processes this data to determine which function to call and what inputs to provide.
+
+2. **Bytecode**:
+   - When a contract is deployed, it is compiled into `bytecode understood by the EVM.` 
+   - This `bytecode` represents exactly the `low level instructions` to make our contract happen.
+   - This **bytecode consist of opcodes**
+
+3. **Opcodes**:
+   - Each opcode is a 2-character hexadecimal, represents some special instruction
+   - This opcode reader is sometimes abstractly called the `EVM`   
+  
+4. **Encoding Data**:
+    - Now, `ABI encoding will convert data into bytes`
+    - **abi.encodePacked() || abi.encode()**
+
+5. **Decoding data**:
+    - Decoding is the process of taking the raw bytes and reconstructing the original data
+    - **abi.decode()**
+
+
+6. **Low-Level call and staticcall**:
+    1. **`call`** 
+        - How we call functions to change the state variable of the blockchain
+        ```solidity
+        function stateChange(address _address) public {
+            s_state[_address] = 12;
+        }
+        ```
+
+    2. **`staticcall`**
+       - This is how (at a low level) we do our "view" or "pure" function calls  
+        ```solidity
+        function getState() public view returns(uint256){
+            return s_state;
+        }
+        ```
+
+
+
+**Converting SVG string to Base64 using EVM**
+```solidity
+string memory SVG = vm.readFile('img/img.svg');
+string memory SVG_TO_BASE64 = Base64.encode(bytes(string(abi.encodePacked(SVG))));
+```
+
+
+
+
+
+#### Send TNX that call functions with just data field populated (EVM Signature Selector)
+
+- In order to call a function using only the data field of call, we need to encode:
+    1. function name
+    2. parameters we want to add
+
+
+- Now each contract assigns each function a **`function ID/Method ID`**:
+    
+    1. **`Function selector`** is the first 4 bytes of the function signature
+    2. **`Function signature`** a string that defines the function name & parameters
+                                `transfer(address,uint256)`
+
+
+
+
+**send TNX by calling a function by populating the data field!!!**:  
+
+- Lets assume, we need to call `transfer(address,uint256)` but by filling the data field!!!
+
+
+1. **`getFunctionSelector`**:
+
+   ```solidity
+    // By this method we will get function selector of the calling function.
+    function getSelector() public pure returns (bytes4 selector) {
+        selector = bytes4(keccak256(bytes("transfer(address,uint256)")));
+    }
+   ``` 
+
+
+2. **`call Transfer Function with selector`**:
+    
+   - Will use **`abi.encodeWithSelector(bytes4 selector, args1, args2)`** 
+
+    ```solidity
+    // Here, using EVM cheatcodes we can directly call the transfer() function using data-field
+    function callTransferData(address _address, uint256 _amount) public returns (bytes4 ,bool) {
+        (bool success, bytes memory data) = address(this).call(
+            abi.encodeWithSelector(getSelector(), _address,_amount)
+        );
+        return (bytes4(data), success);
+    }
+    ```
+
+3. **`call Transfer Function with signature`**:
+
+    - Will use **`abi.encodeWithSignature(string functSignature, args1, args2)`**
+
+    ```solidity
+    // Here, we will not use function selector. Rather, we will use function signature to call our transfer() function by populating data field.
+    function callTransferDataSig(address _address, uint256 _amount) public returns (bytes4 ,bool) {
+        (bool success, bytes memory data) = address(this).call(
+            abi.encodeWithSignature("transfer(address,uint256)", _address,_amount)
+        );
+        return (bytes4(data), success);
+    }
+    ```
+
+
+
+#### Best practices to follow, to check the correct metamask TNX before TNX happens!!!
+
+- The calls we discuss previously all our **`low-level calls`** that our used to omptimize our code.
+
+1. **Check address**
+2. **Check function selector(MethodID/FunctionID)**:
+   - `cast sig "transfer(address,uint256)"` 
+   - This will return the function selector
+
+3. **Decode the call data to check params**:
+   - `cast --calldata-decode "transfer(address,uint256)" HexData` 
+   - This will return the params passed, before TNX
+   - **HexData** will be available in metamask TNX pop-up!!!
+
+
+
+
+
+
+
+### FOUNDRY-DEVOPS🔥
+
+#### foundry-devops
 
 A repo to get the most recent deployment from a given environment in foundry. This way, you can do scripting off previous deployments in solidity.
 
 It will look through your `broadcast` folder at your most recent deployment.
 
-## Features
+#### Features
 
 - Get the most recent deployment of a contract in foundry
 - Checking if you're on a zkSync based chain
 
-# Getting Started
+#### Getting Started
 
-## Installation
+#### Installation
 
 - Update forge-std to use newer FS cheatcodes
 
@@ -2949,9 +3386,9 @@ function interactWithPreviouslyDeployedContracts() public {
 }
 ```
 
-## Usage - zkSync Checker
+#### Usage - zkSync Checker
 
-### Prerequisites
+#### Prerequisites
 
 - [foundry-zksync](https://github.com/matter-labs/foundry-zksync)
   - You'll know you did it right if you can run `foundryup-zksync --help` and you see a response like:
@@ -2965,7 +3402,7 @@ Update or revert to a specific Foundry-zksync version with ease.
 .
 ```
 
-### Usage - ZkSyncChainChecker
+#### Usage - ZkSyncChainChecker
 
 In your contract, you can import and inherit the abstract contract `ZkSyncChainChecker` to check if you are on a zkSync based chain. And add the `skipZkSync` modifier to any function you want to skip if you are on a zkSync based chain.
 
@@ -2979,18 +3416,18 @@ contract MyContract is ZkSyncChainChecker {
   function doStuff() skipZkSync {
 ```
 
-### ZkSyncChainChecker modifiers
+#### ZkSyncChainChecker modifiers
 
 - `skipZkSync`: Skips the function if you are on a zkSync based chain.
 - `onlyZkSync`: Only allows the function if you are on a zkSync based chain.
   
-### ZkSyncChainChecker Functions
+#### ZkSyncChainChecker Functions
 
 - `isZkSyncChain()`: Returns true if you are on a zkSync based chain.
 - `isOnZkSyncPrecompiles()`: Returns true if you are on a zkSync based chain using the precompiles.
 - `isOnZkSyncChainId()`: Returns true if you are on a zkSync based chain using the chainid.
 
-### Usage - FoundryZkSyncChecker
+#### Usage - FoundryZkSyncChecker
 
 In your contract, you can import and inherit the abstract contract `FoundryZkSyncChecker` to check if you are on the `foundry-zksync` fork of `foundry`.
 
@@ -3006,12 +3443,12 @@ contract MyContract is FoundryZkSyncChecker {
 
 You must also add `ffi = true` to your `foundry.toml` to use this feature.
 
-### FoundryZkSync modifiers
+#### FoundryZkSync modifiers
 
 - `onlyFoundryZkSync`: Only allows the function if you are on `foundry-zksync`
 - `onlyVanillaFoundry`: Only allows the function if you are on `foundry`
 
-### FoundryZkSync Functions
+#### FoundryZkSync Functions
 
 - `is_foundry_zksync`: Returns true if you are on `foundry-zksync`
 
@@ -3021,47 +3458,224 @@ You must also add `ffi = true` to your `foundry.toml` to use this feature.
 
 
 
+### WEB3 FRONTEND CODE SNIPPETS🔥
 
-### Connect Wallet Btn function
+- It contains some `code snippets for frontend` that are used repeatedly in frontend!!!
 
-- A simple yet effective connect wallet btn function
+
+
+#### CONNECT WALLET BTN FUNCTION (FRONTEND)
+
 
 ```js
-// connect wallet function
-    const {ethereum} = window;
-    const web3 = new Web3(ethereum);
+'use client';
+import React from 'react'
+import { ConnectWalletBtn } from '../components/ConnectWalletBtn';
+import ToDoList from '../components/ToDoList';
+import { Web3 } from 'web3';
+import address from "../config";
+import abi from "../abi";
+
+
+const Home = () => {
+  const [correctNet, setCorrectNet] = React.useState(false);
+  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [currentAcc, setCurrentAcc] = React.useState('');
+  const [input, setInput] = React.useState('');
+  const [task,setTasks] = React.useState([]);
+  const web3 = new Web3('https://sepolia.infura.io/v3/6e2aaaa2ff0c4e00995a96624cca8e7a');
+
+  // INITIALIZE THE SMART CONTRACT  
+
+  const token = new web3.eth.Contract(abi.abi, address.contractAddress);
+
+  // CONNECT WALLET BTN FUNCTION
   const ConnectWallet = async ()=>{
     try {
-        if(!ethereum){
-            return <h1>Metamask wallet not found!!!</h1>
-        }
+      const {ethereum} = window;
 
-        // get chain-id
-        const chainId = await ethereum.request({method:"eth_chainId"});
-        console.log("ChainId:",chainId);
-
-        // check for correct network
-        const sepolia_chain_id = "0xaa36a7"; // 11155111
-        if(chainId != sepolia_chain_id){
-          alert("You are not connected to sepolia!!");
+      if(!ethereum){
+        console.log("MetaMask not detected!!!");
+        return;
+      }
+      
+      const chainId = await ethereum.request({method:"eth_chainId"});
+      console.log("connected to chain id : ", chainId);
+      
+      const sepoliaChainId = "0xaa36a7";
+      if(chainId != sepoliaChainId){
+          alert("You are not connected to sepolia test network!!!") 
+          setCorrectNet(false);
           return;
-        }
-        setCorrectNet(true);
+      }
+      setCorrectNet(true);
 
-        // get accounts
-        const accounts = await ethereum.request({method:"eth_requestAccounts"});
-        console.log(accounts[0]);
-        setAccount(accounts[0]);
-        setLoggedIn(true);
-
-        // set function for account changed
-        ethereum.on('accountsChanged', async()=>{
-          const accounts = await web3.eth.getAccounts();
-          setAccount(accounts[0]);
-        })
+      const accounts = await ethereum.request({method:"eth_requestAccounts"});
+      console.log("account address detected : ", accounts[0]);
+      setLoggedIn(true);
+      setCurrentAcc(accounts[0]);
 
     } catch (error) {
       console.log(error);
     }
+  } 
+
+  // ADD TASK FUNCTION
+  const AddTask = async ()=>{
+    try {
+      const {ethereum} = window;
+      if(ethereum){
+          await token.methods.addTask(input).send({from:currentAcc})
+          .then(res=>{
+            setTasks(...task,task);
+            console.log("Task added");
+          })
+          .catch(error =>{
+            console.log(error);
+          })
+      } else{
+        console.log("Eth does not exist");
+        
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
+
+  return (
+    <div>
+      <div>
+        <h1 className='btn btn-primary m-4'>{currentAcc}</h1>
+        {
+          loggedIn ? <ToDoList setInput={setInput} AddTask={AddTask}></ToDoList> : <ConnectWalletBtn ConnectWallet={ConnectWallet} />
+        }
+      </div>
+    </div>
+  )
+}
+
+export default Home; 
 ```
+
+
+
+
+
+### Decentralized Finance (DeFi)
+
+**DeFi is an finance system that provides **`permissionless and transparent financial services`** using blockchain network and smart contracts.**
+
+
+- **Decentralized finance, or DeFi**, is an emerging P2P finance system attempting to remove third parties and centralized institutions from financial transactions.
+- It is built on cryptocurrencies, blockchain technology, and software that provides **financial services** like lending, borrowing, trading, and investing without needing a middleman.
+- 
+
+
+
+#### Applications of DeFi
+
+1. **Lending and Borrowing**:
+    - `Aave and Compound` allow users to lend their crypto and earn interest.
+
+
+2. **Decentralized Exchanges (DEXs):**
+    - `Uniswap, SushiSwap` Users can trade tokens without a centralized exchange or order book.
+
+3. **Stablecoins**:
+    - `DAI,USDC` this bridge the gap between traditional finance and cryptocurrencies by offering the stability of fiat with the efficiency of blockchain!
+
+4. **Yield Farming:**
+    - Users earn rewards by providing liquidity or staking tokens in DeFi protocols.
+
+5. **Insurance**:
+    - Platforms like `Nexus Mutual` offer decentralized insurance for smart contract risks. 
+
+6. **Derivatives and Prediction Markets:**
+    - `Synthetix` Prediction markets let users bet on outcomes of events.
+
+
+
+#### What does DeFi Protocol means!!!
+
+- A `DeFi protocol` is a set of rules or smart contracts that enable decentralized financial services like lending, borrowing, and trading without the need for banks or intermediaries.
+- These protocols run on blockchains like Ethereum.
+
+**`Examples`**
+**Uniswap:** A DeFi protocol for swapping cryptocurrencies.
+**MakerDAO/DAI:** A protocol that manages the DAI stablecoin.
+
+
+
+
+### Stablecoins
+
+**Stablecoins is a cryptocurrencies whose buying power remains stable!!!**
+
+- `Stablecoins` are usually tied to the value of something stable, like a national currency (US Dollar) or commodity(gold).
+- For ex, Bitcoin or Ethereum, which are not Stablecoins, whose prices can change drastically. 
+
+**EX:** (1 USDC == 1 USD)
+
+
+
+#### Categories of Stablecoins
+
+
+1. **`Relatively Stabled(Pegged/Floating Stablecoin)`**:
+    - Coins which depends on other assets(cryptocurrencies).
+    - `Pegged StableCoin` have their value tied to another assets
+    - `Floating stablecoin` use maths and mechanism to maintain a constant buying power.
+
+2. **`Stability method(Governced/Algorithmic Stablecoin)`**:
+    - This is a mechanism that makes coin stable.
+    - `Governced Stablecoin` this mint and burn token via human intervation
+    - `Algorithmic Stablecoin` it uses a transparent math equation or set of codes to mint and burn tokens.
+
+3. **`Collateral Types`**:
+    - This include `endogenouslly and exogenouslly Collateralized Stablecoins`
+
+    - **Exogenous:** Backed by external assets (USD, ETH). Generally more stable. (`USDT/DAI/RAI/USDC/FRAX`)
+    - **Endogenous:** Backed by internal assets (project's own token). More risky due to dependency on the token's value.(`UST-Lunna/Terra`)
+
+
+4. **`Fiat-Collateralized Stablecoins:`**
+    - These are backed by real-world money, like dollars, stored in a bank.
+    - **Example**: USDT (Tether), USDC
+
+5. **`Crypto-Collateralized Stablecoins:`**
+    - These are backed by other cryptocurrencies as collateral.
+    - This are often `over-collateralized`
+    - **Example**: DAI,RAI,FRAX
+
+6. **`Algorithmic  Stablecoins:`**
+    - This uses algorithms and smart contracts to manage the coin's supply and keep its value stable.
+    - **Example**: UST(Terra/Luna)
+
+
+
+#### Why Do We Need Stablecoins in DeFi?
+
+1. **Reduce Volatility:** 
+    - Unlike Bitcoin or Ethereum, their value doesn't swing wildly, making them safer for `financial transactions`.
+
+2. **Ease of Use:** 
+    - They provide a familiar, dollar-like currency for DeFi users.
+
+3. **Seamless Trading:** 
+    - Stablecoins are used as a base currency in trading pairs, allowing people to trade crypto assets without dealing with volatility.
+    
+4. **Lending and Borrowing:** 
+    - Users can lend and borrow stablecoins on DeFi platforms, avoiding the risks of crypto price changes.
+
+5. **Savings:** 
+    - Stablecoins allow users to earn interest without worrying about their savings losing value.
+
+
+
+#### Examples of Popular Stablecoins
+
+1. **Tether(USDT):** Backed by fiat currency reserves.
+
+2. **USD Coin(USDC):** Similar to Tether but focuses on transparency.
+
+3. **DAI/RAI/FRAX:** Decentralized and backed by other crypto assets.
