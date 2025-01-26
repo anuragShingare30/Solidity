@@ -1371,7 +1371,7 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 2. **CHAINLINK VRF**
 3. **CHAINLINK AUTOMATION**
 4. **END-TO-END RELIABILITY(TAKE INPUT, RETURN OUTPUT)**
-
+5. **Chainlink DATA Feeds**
 
 
 
@@ -1478,7 +1478,7 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 
 
 
-### CHAINLINK AUTOMATION
+#### CHAINLINK AUTOMATION
 
 - To automate some functions in our smart contract,
     - `checkUpkeep()` checks if enough time has passed to call main logic
@@ -1542,29 +1542,49 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 
 
 
+#### CHAINLINK DATA FEEDS
 
+- To get the real time data for assets,currency coversion. We can use chainlink data feeds.
 
-### MATH CONVERSIONS IN SOLIDITY
-
-- Converting the value of ETH to USD
-- As prog. language it does not **support floating point number**
-
-```js
+**Getting the latest price of ETH in USD**
+```solidity
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-function getPrice() internal view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
-        (int256 answer) = priceFeed.latestRoundData();
-        return uint256(answer * 10000000000);
-}
-function getConversionRate(uint256 ethAmount) public view returns (uint256) {
-    // getPrice() function will return current eth price in usd.
-    uint256 ethPrice = getPrice();
-    uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
-    return ethAmountInUsd;
+
+contract DataConsumerV3 {
+    AggregatorV3Interface internal dataFeed;
+    /**
+     * Network: Sepolia
+     * Aggregator: BTC/USD
+     * Address: 0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43
+     */
+    constructor() {
+        dataFeed = AggregatorV3Interface(
+            0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43
+        );
+    }
+
+    function getChainlinkDataFeedLatestAnswer() public view returns (int) {
+        (,int price,,) = dataFeed.latestRoundData();
+        return answer;
+    }
+
+    function getValueInUsd() public view returns(uint256 usdValue){
+        int price = getChainlinkDataFeedLatestAnswer();
+        uint256 private constant PRICE_FEED_SCALE_FACTOR = 1e10;
+        uint256 private constant TOKEN_DECIMAL_STANDARD = 1e18;
+        uint256 public amount = 1;
+
+        // (price * 1e10 * 1)/1e18 == price/1e8 == $3425.781919...
+        usdValue = (uint256(price) * PRICE_FEED_SCALE_FACTOR * amount) / TOKEN_DECIMAL_STANDARD;
+    }
 }
 ```
 
-**NOTE** : In solidity, multiply before dividing to get better precision.
+
+**NOTE** : In solidity, multiply has more preference than division.
+
+
+
 
 ### CREATING OUR OWN libraries(optional)
 
@@ -2916,7 +2936,7 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 
 #### Some best practices to follow!!!
 
-1. **`vm.prank(address(0))`** 
+1. **`vm.prank(address(1))`** 
    - simulate a TNX to be sent from given specific address.
 
 2. **`vm.deal(address(this), 1 ether)`** 
@@ -3044,13 +3064,37 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
     } 
     ``` 
 
+17. **`transfer() and transferFrom()`**:
+    - `transfer()` we use this when we send transaction to ourself.
+    - `transferFrom()` we use this function when we want to send transaction to another account.
 
-17. **During testing with foundry, keep some point for best practices:**
+  
+
+18. **During testing with foundry, keep some point for best practices:**
     - Never make a variable public which contain imp. keys.
     - Write `getterFunctions` 
     - Only main contract can call `errors,events,structs,enums,types aliases`
     - Contract instance can call/send `getter n write functions`
     - continue...
+
+
+
+
+#### Some Important testing methods.
+
+
+1. **Testing the constructor params**:
+    - To test whether the constructor params are passed correctly or not:
+    ```solidity
+    function test_ConstructorParams() public {
+        // create new contract instance
+        vm.expectRevert();
+        new Contract(params1,params2,params3);
+    }
+    ``` 
+
+
+
 
 
 
