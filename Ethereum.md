@@ -2,6 +2,8 @@
 
 ### Software and Platform Used!!!
 
+**`Software tools`**
+1. ChatGPT
 
 **`RPC Provider`**
 1. Infura RPC provider
@@ -12,6 +14,8 @@
 2. Chainlink DevHub
     - Chainlink VRFv2.5
     - Chainlink automationv2.1
+    - Chainlink Datafeeds
+    - Mock contracts
 3. Alchemy contracts
 4. Soulmate and brownie-smart-contracts
 
@@ -3094,6 +3098,9 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
     ``` 
 
 
+2. **Mock Contracts**:
+   - If we are using mock contract and replicating it just like our one of the main contract.
+   - We can used in `testing as mock contract`. 
 
 
 
