@@ -3163,8 +3163,6 @@ contract ContractTest is Test {
 
 
 
-
-
 #### Remapping dependencies
 
 - Before running the forge remapping command we need to store the path in **toml**
@@ -3198,6 +3196,150 @@ forge coverage --report lcov
 // This will create a .txt file that will give us the parts of our contracts cover:
 forge coverage --report debug > coverage.txt
 ```
+
+
+
+### FUZZ/INVARIENT TEST USING FOUNDRY
+
+- Fuzz/Invarient test will `automatically input random data in our test to break specific conditions`.
+- This test helps us to find bug which we cannot find using unit test.
+- Foundry will check for `invarient` keyword in function name during fuzz test.
+
+
+
+#### Terminologies in fuzz test
+
+1. **Invarient**:
+   - A value or specific condition that should `always remain same` regardless of our `change in state/input data.`
+   - `Invarient` can be a value or specific condition that should always hold for our system to work.
+
+2. **StateLess fuzz test**:
+    - `Stateless fuzz test` where state of previous run is discarded for every new run.
+    - For, this test fuzzer will try various random data to break the invarient condition.
+
+3. **StateFul fuzz test**:
+    - `StateFul fuzz test` The final state of your previous run is starting state of our new run!!!
+    - Stateful test -> Invarient test
+
+4. **Setting the runs**:
+    - In `foundry.toml` we can include the number of runs or random data fuzzer should used.
+    **foundry.toml**
+    ```solidity
+    [fuzz]
+    runs=1000
+
+    [invarient]
+    runs=1000
+    depth=1000
+    fail_on_revert=false/true
+    ```
+
+
+#### Writing StateLess Fuzz test
+
+- `Stateless fuzz test` where state of previous run is discarded for every new run.
+- the state of the variables will be forgotten on each run.
+
+- Creating a stateless fuzz test is `same` as creating test in framework.
+- Consider a simple DApp which will allow user to deposit and withdraw ETH.
+- Then, for this contract we will try to find the `invarient value or condition` that can break our system.
+
+**SampleContract.sol**:
+```solidity
+contract SimpleDapp {
+    mapping(address user => uint256 amount) public balances;
+    function deposit() external payable {
+        balances[msg.sender] += msg.value;
+    }
+    function withdraw(uint256 _amount) external {
+        require(balances[msg.sender] >= _amount, "Insufficient balance");
+        balances[msg.sender] -= _amount;
+        (bool success, ) = msg.sender.call{value: _amount}("");
+        require(success, "Withdraw failed");
+    }
+}
+```
+- The invarient can be, user cannot withdraw money more than deposit!!!
+- The fuzzer will try random values for both variables depositAmount and withdrawAmount
+ 
+**Sateless fuzz test**:
+```solidity
+import {Test} from "forge-std/Test.sol";
+import {SimpleDapp} from "../src/SimpleDapp.sol";
+
+contract SimpleDappTest is Test {
+    SimpleDapp simpleDapp;
+    address public user;
+    function setUp() public {
+        simpleDapp = new SimpleDapp();
+        user = address(this);
+    }
+    // Fuzzer will try different random data for both depositAmount and withdrawAmount
+    function invarient_testDepositAndWithdraw(
+        uint256 depositAmount,
+        uint256 withDrawAmount
+    ) public {
+        // code here
+        // perform the basic test for deposit and withdrawal functions
+    }
+}
+```
+
+
+
+#### Writing StateFul Fuzz test
+
+- `StateFul fuzz test`: The final state of your previous run is starting state of our new run!!!
+- the state of the variables is remembered across multiple runs
+
+- Define a `targetContract(address)` -> Now foundry will `automatically executes all contract functions` with random input data.
+- We will define a target-contract, `Foundry will automatically start executing all the contract functions randomly` and setting random input parameters as well.
+
+- We will set a sample contract, where we will fetch the invarient.
+
+
+
+**AlwaysEven.sol**:
+```solidity
+contract AlwaysEven {
+    uint256 public alwaysEvenNumber;
+    uint256 public hiddenValue;
+    function setEvenNumber(uint256 inputNumber) public {
+        if (inputNumber % 2 == 0) {
+            alwaysEvenNumber += inputNumber;
+        }
+        if (hiddenValue == 8) {
+            alwaysEvenNumber = 3;
+        }
+        hiddenValue = inputNumber;
+    }
+}
+```
+- Now, write the StateFul fuzz test. Here, we will define our `targetContract(address)`
+
+**AlwaysEven stateful fuzz test**:
+```solidity
+import {StdInvariant} from "forge-std/StdInvariant.sol";
+import {Test} from "forge-std/Test.sol";
+import {AlwaysEven} from "../src/AlwaysEven.sol";
+import {Handler} from "./Handler.t.sol";
+
+contract AlwaysEvenTestStateful is StdInvariant, Test {
+    AlwaysEven alwaysEven;
+    function setUp() public {
+        alwaysEven = new AlwaysEven();
+        Handler handler = new Handler(/**any constructor params */);
+        targetContract(address(handler));
+    }
+    // foundry will identify test by 'invarient' keyword
+    function invariant_testsetEvenNumber() public view {
+        assert(alwaysEven.alwaysEvenNumber() % 2 == 0);
+    }
+}
+```
+
+- Here, above we declared something `Handler.t.sol` as our target-contract.
+- Now, foundry will automatically executes all functions in `Handler contract` with random input data.
 
 
 
