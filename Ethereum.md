@@ -2197,7 +2197,7 @@ data:image/svg+xml;base64,
 npm init
 npm install --save-dev hardhat
 npx hardhat init
-npm i --save @openzeppelin/contracts
+clear
 npm install --save-dev @nomicfoundation/hardhat-toolbox
 ```
 
@@ -3099,8 +3099,9 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 
 
 2. **Mock Contracts**:
-   - If we are using mock contract and replicating it just like our one of the main contract.
-   - We can used in `testing as mock contract`. 
+   - Check `Ethereum/MockSmartContracts` to use the mock smart contracts in testing. 
+   - Mock smart contracts contains all functions replicating our main contract.
+   - Mock smart contracts are usefull in testing a contract.
 
 
 
