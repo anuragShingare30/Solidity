@@ -3202,7 +3202,7 @@ forge coverage --report debug > coverage.txt
 ### FUZZ/INVARIENT TEST USING FOUNDRY
 
 - Fuzz/Invarient test will `automatically input random data in our test to break specific conditions`.
-- This test helps us to find bug which we cannot find using unit test.
+- This test helps us to find bug which we cannot find using `unit test`.
 - Foundry will check for `invarient` keyword in function name during fuzz test.
 
 
@@ -3223,6 +3223,7 @@ forge coverage --report debug > coverage.txt
 
 4. **Setting the runs**:
     - In `foundry.toml` we can include the number of runs or random data fuzzer should used.
+    - This will set the no. of random data to 
     **foundry.toml**
     ```solidity
     [fuzz]
@@ -3259,7 +3260,7 @@ contract SimpleDapp {
     }
 }
 ```
-- The invarient can be, user cannot withdraw money more than deposit!!!
+- The invarient can be, user cannot withdraw money more than deposited!!!
 - The fuzzer will try random values for both variables depositAmount and withdrawAmount
  
 **Sateless fuzz test**:
@@ -3340,6 +3341,7 @@ contract AlwaysEvenTestStateful is StdInvariant, Test {
 
 - Here, above we declared something `Handler.t.sol` as our target-contract.
 - Now, foundry will automatically executes all functions in `Handler contract` with random input data.
+
 
 
 
