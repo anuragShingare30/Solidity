@@ -628,7 +628,8 @@ contract ContractTwo {
         one.deposit{value:amount, gas:100000}();
 
         // 2. REQUIRES FALL-BACK FUNCTION.
-        (bool send,) = to.call{value:amount, gas:100000}("");
+        // here we are calling receive() function to send plain ether!!!
+        (bool send,) = to.call{value:amount, gas:100000}("");r
         require(send);
     }
 }
@@ -1374,9 +1375,8 @@ function getRefundAmount(uint tokenId) public view returns (uint){
 1. **CHAINLINK FUNCTIONS**
 2. **CHAINLINK VRF**
 3. **CHAINLINK AUTOMATION**
-4. **END-TO-END RELIABILITY(TAKE INPUT, RETURN OUTPUT)**
-5. **Chainlink DATA Feeds**
-
+4. **Chainlink DATA Feeds**
+5. **Cross chain interoperability protocol (CCIP)**
 
 
 
@@ -2369,7 +2369,7 @@ npx hardhat ignition deploy ./ignition/modules/deploy.cjs --network sepolia
 // ./ignition/modules/deploy.js
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 
-const TokenModule = buildModule("TokenModule", (m) => {
+const TokenModule = buildModule("TokenModule", (m:any) => {
     // constructor params
     const entranceFee = 1_000_000_000n; // 0.01 ETH
     const interval = 30; // 30 seconds
@@ -3074,7 +3074,71 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 
   
 
-18. **During testing with foundry, keep some point for best practices:**
+18. **`type(uint256).max`**:
+    - We will use this to get the complete balance of user.
+    - It checks if the value of _amount is equal to the maximum possible value of uint256
+    ```solidity
+    function transfer(uint256 _amount) public {
+        if(_amount == type(uint256).max){
+            transfer(from, type(uint256).max);
+        }
+    }
+    ``` 
+    - This ensures that the transfer operation will send the **entire balance of _from**
+
+19. **`Access control`**:
+    - `onlyOwner` and `onlyRole`
+    - This are some modiefiers which are important in access control for contract
+
+
+20. **`state = bound(state,min,max)`**:
+    - A mathematical function for wrapping inputs of `fuzz tests` into a certain range.
+    - This method is used in the fuzz testing
+    ```solidity
+    input = bound(input, 99, 101);
+    ``` 
+
+22. **`Sending ETH to contract by send function`**:
+    - When we want to pass the ETH to contract (msg.value).
+    ```solidity
+    function senderFunction(uint256 amount) public payable {
+        // This will act as msg.value in contract
+        tokenContract.senderFunction{value:10 ether}();
+    }
+    
+    ``` 
+
+23. **`assertGt(left,right)`**:
+    - Asserts left is `strictly greater than right`.
+    - Check for -> (left > right)
+
+
+24. **`vm.createSelectFork()`**:
+    - `vm.createFork()` and `vm.selectFork()`
+    - This will create the testing environment at different chain network
+    - Creates and selects a new fork from the given endpoint for different blockchain newtork
+
+    ```solidity
+    <!-- This will seperately create and select the fork -->
+    string memory ETHEREUM_SEPOLIA_RPC_URL = vm.envString("ETHEREUM_SEPOLIA_RPC_URL");
+    uint256 forkId = vm.createFork(ETHEREUM_SEPOLIA_RPC_URL);
+    vm.selectFork(forkId);
+
+    <!-- this will simultaneously create and select fork -->
+    uint256 forkId = vm.createSelectFork(MAINNET_RPC_URL);
+    ```
+
+
+25. **`vm.makePersistent(address _contractAddress)`**:
+    - contract state is available regardless of which fork is currently active.
+
+    ```solidity
+    Contract tokenContract = new Contract();
+    vm.makePersistent(address(tokenContract));
+    ``` 
+
+
+26.  **During testing with foundry, keep some point for best practices:**
     - Never make a variable public which contain imp. keys.
     - Write `getterFunctions` 
     - Only main contract can call `errors,events,structs,enums,types aliases`
@@ -3620,7 +3684,6 @@ You must also add `ffi = true` to your `foundry.toml` to use this feature.
 
 
 ```js
-'use client';
 import React from 'react'
 import { ConnectWalletBtn } from '../components/ConnectWalletBtn';
 import ToDoList from '../components/ToDoList';
