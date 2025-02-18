@@ -16,6 +16,7 @@
     - Chainlink automationv2.1
     - Chainlink Datafeeds
     - Mock contracts
+    - CCIP and CCT
 3. Alchemy contracts
 4. Soulmate and brownie-smart-contracts
 
@@ -25,6 +26,7 @@
 3. Foundry-forge
 4. Web3.js/ethers.js
 5. ThirdWeb
+6. Etherscan
 
 **`File storage`**
 1. IPFS (web/desktop app)
@@ -1590,6 +1592,35 @@ contract DataConsumerV3 {
 
 
 
+#### Cross Chain Token(CCT) Standard (defines flow of contract)
+
+- **A `Cross-Chain Token Standard` is a set of rules that ensures tokens can move between different blockchains safely and efficiently by leveraging the chainlink CCIP for security**
+- `Cross-chain token standards` are just set of rules and instructions that should be followed during transferring tokens cross chain.
+
+**Example**: A stablecoin that seamlessly moves between Ethereum and Polygon.
+
+- Ensures all tokens moving across chains follow the same secure protocol.
+- `CCT standard` provides different mechanism for transferring tokens like `burn/mint, lock/unlock`
+
+
+
+
+#### Cross chain interoperability protocol (CCIP)
+
+- `Chainlink CCIP` is a system/process that allows smart contracts to `transfer data/assets/tokens` cross-chain!!!
+- `CCIP is the bridge` that connects separate blockchains, allowing them to exchange information securely and efficiently.
+- It uses `defense-in-depth security` for transfering data/assets cross chain
+- `CCIP` uses **`Decentralized Oracle network(DON) and Risk management network(RMN)`** to check security and transparency for transfering data
+- CCIP also include `rate limits` for transferring data/assets for security.
+
+**Note: CCIP is performing blockchain bridging in more secure and efficient way as compare to traditional  blockchain bridging!!!**
+
+- CCIP will provide the `standard Pool contract` and `Transferring/Bridging tokens cross-chain`
+
+
+
+
+
 ### CREATING OUR OWN libraries(optional)
 
 - When a functionality can be commonly used, we can create a **library** to efficiently manage repeated parts of codes.
@@ -2121,7 +2152,7 @@ truffle debug <TXHASH> --network ganache --fetch-external
 
 
 
-### Off-chain and On-chain storage
+#### Off-chain and On-chain storage
 
 
 **Off-chain URI Representation**
@@ -3894,3 +3925,56 @@ export default Home;
 2. **USD Coin(USDC):** Similar to Tether but focuses on transparency.
 
 3. **DAI/RAI/FRAX:** Decentralized and backed by other crypto assets.
+
+
+
+
+### What is Rebase tokens?
+
+**Rebase tokens are type of cryptocurrency that have a changing circulating supply, either growing larger (more coins being created/minted) or decreasing (coins get destroyed or 'burnt'), usually to maintain a stable price or achieve a specific target price.**
+
+
+1. **Traditional tokens**:
+    - This have a fixed supply set at the creation of the token. The price of these tokens is determined purely by `market demand and supply dynamics`
+  
+2. **Rebase tokens**:
+    - This are type of crypto-currency. Also called as Elastic token.
+    - have a changing circulating supply
+    - either growing larger (more coins being created/minted)
+    - Or, decreasing (coins get destroyed or 'burnt')
+    - can `increase or decrease their supply` automatically!!!
+
+
+
+#### How Do Rebase Tokens Work?
+
+
+1. **Target Price & Supply Adjustment**:
+   - designed to maintain a `target price` (e.g., $1 per token).
+   - If the price goes above the target, `the supply increases` (minting).
+   - If the price drops below the target, `the supply decreases` (burning).
+
+2. **Rebasing Mechanism**:
+   - At fixed time interval, protocol will check the token price
+   - Contract automatically adjusts the total supply of the token depending on the token market price!!!
+   - If a rebase reduces supply -> `Users balance decreases`
+   - If a rebase increases supply -> `Users balance increases`
+   - but their share of the total supply remains the same 
+
+
+3. **Positive Rebasing**:
+   - When the price of token is high relative to its target (say, $1.00) 
+   - the protocol automatically increases the supply, distributing more token to all holders proportionally!!!
+   - `which theoretically should lower the price`
+  
+4. **Negative Rebasing**:
+   - if the price of token falls below the dollar mark($1)
+   - Protocol reducing the number of tokens in each holder's wallet
+   - `attempting to increase the price per token`
+
+
+**Example rebase tokens**:
+- Ampleforth (AMPL)
+- Yam Finance (YAM)
+- Base Protocol (BASE)
+- Olympus DAO (OHM)
