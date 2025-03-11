@@ -3080,7 +3080,7 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 
     **foundry.toml**
     ```solidity
-    fs_permissions = [{ access = "read", path = "./"}]
+    fs_permissions = [{ access = "read-write", path = "./"}]
     ``` 
     **Use vm.readFile(path)**
     ```solidity
@@ -3166,6 +3166,16 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
     ```solidity
     Contract tokenContract = new Contract();
     vm.makePersistent(address(tokenContract));
+    ``` 
+
+26. **SafeERC20 library**:
+    - `SafeERC20 library` supports `safeTransfer(account,amount)` function to contract.
+    - This pervent the transfer of token to reciever who is not able to recieve the token.  
+    ```solidity
+    contract Token{
+        using SafeERC20 for IERC20;
+        <!-- rest of code -->
+    }
     ``` 
 
 
@@ -3943,6 +3953,7 @@ export default Home;
     - either growing larger (more coins being created/minted)
     - Or, decreasing (coins get destroyed or 'burnt')
     - can `increase or decrease their supply` automatically!!!
+    - designed to maintain a `target price` (e.g., $1 per token).
 
 
 
