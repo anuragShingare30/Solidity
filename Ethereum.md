@@ -4066,3 +4066,260 @@ export default Home;
 
 
 *A smart contract can store only the Merkle root on-chain, saving more gas than storing every address on an airdrop. The Merkle tree generates a Merkle proof, which can be verified to prove eligibility. This proof authenticates a specific wallet address included in the list of eligible wallets by comparing it to the Merkle root.*
+
+
+
+
+### Signature Verification
+
+**Signatures provide a means for authentication in blockchain technology, allowing operations, such as sending transactions, to be verified that they have originated from the intended signer.**
+- In blockchain applications, `signature verification` ensures that a message, transaction, or data was signed by the rightful owner of a private key.
+- ` Signature verification` is the process of checking whether a `cryptographic signature was created by the legitimate owner` of an Ethereum address
+
+- It also confirms:
+  - **The message was signed using the correct private key.**
+  - **The message was not tampered with after signing.**
+
+
+#### Why we need Signature verification?
+
+
+**Ethereum uses Elliptic Curve Digital Signature Algorithm (ECDSA) to generate signatures.**
+- We can use `Signature Verification` in our application to provide on-chain authenticity and security!!!
+
+**Some Application of Signature Verification:**
+
+1. **Ensuring Authenticity & Identity**:
+    - Only the private key owner can generate a valid signature.
+    - This allows off-chain signing and on-chain verification, reducing gas costs
+    - `Example: An admin signs an airdrop claim request, ensuring only eligible users can claim tokens.`
+
+2. **Gasless Transactions**:
+    - Users sign messages off-chain instead of sending transactions.
+    - A relayer (gasPayer) submits the transaction on-chain, paying gas fees.
+    - `Use case: Airdrops, voting, and gasless DeFi interactions.`
+
+3. **Preventing Replay Attacks**:
+    - Signature verification ensures no one else can fake a transaction.
+    - Unique nonces prevent replaying old valid signatures.
+    - `Example: Preventing users from claiming an airdrop multiple times.`
+
+4. **Smart Contract Security**:
+    - Ensures only authorized users interact with sensitive contract functions.
+    - Can replace msg.sender checks for access control.
+    - `Example: Permit functions in ERC20 (EIP-2612) allow token approvals via signatures`\
+    
+
+
+### Signature Standards
+
+**When signing transactions, there needed to be an easier way to read transaction data!!!**
+
+
+- `Signature standards` meant that transactions could be `displayed in a readable way` during transaction!!!
+- `Simple SIgnature` is available easily on solidity but data is displayed in hash and bytes format!!!
+  
+- `EIP-191 and EIP-712` allow us to display TNX data in `structural and readable way` 
+
+
+1. **SImple SIgnature**:
+    - In this, we will create a function that will take data(any msg.) and signatures component(r,s,v).
+    - Retrives the signer address
+    - And, lastly compares with original signer address.
+    - `ecrecover` is percompile function -> retrieves the signer address!!!
+
+    ```solidity
+    <!-- This Will Retrive the signer addresss -->
+    function getSignerSimple(uint256 message, uint8 _v, bytes32 _r, bytes32 _s) public pure returns (address) {
+        // if message is string, use keccak256(abi.encodePacked(string))!!!
+        bytes32 hashedMessage = bytes32(message);
+        // retrieve the signer
+        address signer = ecrecover(hashedMessage, _v, _r, _s);
+        return signer;
+    }   
+    <!-- This will compare the signer addresss with actual signer addresss -->
+    function verifySignerSimple(
+        uint256 message,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s,
+        address signer
+    )
+	public pure returns (bool){
+        address actualSigner = getSignerSimple(message, _v, _r, _s);
+        require(signer == actualSigner);
+        return true;
+    }
+    ```
+
+
+
+2. **EIP-191 (Standardizing Signatures)**:
+    - EIP-191 defines how messages should be signed off-chain and verified on-chain.
+    - *Prevents signature replay attacks by defining a structured message format.* 
+    - `EIP-191 Format:` -> 0x19 <byte version> <Validator address> <Data/Msg>
+    
+    - `0x19`-> prefix that signifies data is signature
+    - <byte version>: The version of “signed data” is used.
+        - `0x00`: Data with the intended validator
+        - `0x01`: Structures data - most often used in production apps
+        - `0x02`: personal_sign messages
+    - <data to sign>: The message intended to be signed.
+
+    ```solidity
+    <!-- Function shows how to use EIP-191 Format and retrieves signature -->
+    function getSigner191(uint256 message, uint8 _v, bytes32 _r, bytes32 _s) public view returns (address) {
+        
+        bytes1 prefix = bytes1(0x19);
+        bytes1 eip191Version = bytes1(0);
+        address indendedValidatorAddress = address(this);
+        bytes32 applicationSpecificData = bytes32(message);
+
+        // 0x19 <byte version> <Validator address> <Hash Data>
+        bytes32 hashedMessage =
+            keccak256(abi.encodePacked(prefix, eip191Version, indendedValidatorAddress, applicationSpecificData));
+
+        address signer = ecrecover(hashedMessage, _v, _r, _s);
+        return signer;
+    }
+    <!-- Function will compare the actual signer -->
+    function verifySigner191(
+        uint256 message,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s,
+        address signer)
+	public view returns (bool){
+        address actualSigner = getSigner191(message, _v, _r, _s);
+        require(signer == actualSigner);
+        return true;
+    }
+    ```
+
+    - **Application**: 
+        - MetaMask `signMessage()` follows EIP-191 when signing messages.
+        - Verifying off-chain messages in smart contracts (e.g.,` proving identity in Web3 apps`).
+
+
+
+
+3. **EIP712: Making Signatures Readable**:
+    - If data gets complicated, we will use EIP-712!!!    
+    - EIP-712 introduced standardized data: typed structured data hashing and signing.
+    - `EIP-712 Format:` -> 0x19 0x01 <domainSeparator> <hashStruct(message)>
+    - EIP-712 prevents replay-attacks.
+    
+
+    ```solidity
+    <!-- Create Message Typehash -->
+    struct MerkleAirdropDomain {
+        address account;
+        uint256 amount;
+    }
+    bytes32 constant MESSAGE_TYPEHASH = keccak256("MerkleAirdropDomain(address account,uint256 amount)");
+    <!-- Get Domain Separator -->
+    function getMessageHash(address account,uint256 amount) public pure returns(bytes32) {
+        return (
+            keccak256(
+                abi.encode(
+                    MESSAGE_TYPEHASH,
+                    MerkleAirdropDomain({account:account,amount:amount})
+                )
+            )
+        );
+    }
+    <!-- Function will sign the TNX using EIP-712 format -->
+    function getSignerEIP712(uint256 message, uint8 _v, bytes32 _r, bytes32 _s) public view returns (address) {
+        bytes1 prefix = bytes1(0x19);
+        // EIP-712 is version 1 of EIP-191
+        bytes1 eip712Version = bytes1(0x01);
+        // Domain Separator / hash the message struct
+        bytes32 hashStructOfDomainSeparator = getMessageHash(account,amount);
+        // And finally, combine them all
+        bytes32 digest = keccak256(abi.encodePacked(prefix, eip712Version, hashStructOfDomainSeparator, hashedMessage));
+        // returns the signer address
+        return ecrecover(digest, _v, _r, _s);
+    }
+    <!-- finallly compare the actual signer addresss -->
+    function verifySigner712(
+        uint256 message,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s,
+        address signer)
+    public view returns (bool){
+        address actualSigner = getSignerEIP712(message, _v, _r, _s);
+        require(signer == actualSigner);
+        return true;
+    }
+    ``` 
+
+    - **Application**:
+        - Gasless transactions
+        - Permit function (EIP-2612) → Allows users to sign approvals without sending transactions.
+        - Secure off-chain authentication (Sign-In With Ethereum).
+
+
+
+
+4. **Replay Attacks**:
+    - Same TNX can be sent more than once using same signature
+    - The extra data in the structure of EIP-712 ensures replay resistance.
+
+    - To prevent replay attacks we can consider following points:
+        - Have every signature have a `unique nonce` that is validated
+        - Restrict the s value to a single half
+        - Include a `chain ID` to prevent cross-chain replay attacks 
+
+
+
+- **EIP-191: standardizes what signed data should look like.**
+- **EIP-712: standardizes the format of the version-specific data and the data to sign.**
+
+
+
+
+
+
+## ECDSA ALGORITHM
+
+
+- The `ECDSA` is based on `Elliptic Curve Cryptography (ECC)`
+- *Signatures provide a means for authentication in blockchain technology, allowing operations, such as sending transactions, to be verified that they have originated from the intended signer.*
+
+- **In Ethereum, ECDSA is used for the following:**
+    - Key generation
+    - Signing messages
+    - Signature verification
+
+
+- **The Elliptic Curve Digital Signature Algorithm (ECDSA) is a signature algorithm based on Elliptic Curve Cryptography (ECC).**
+- **`secp256k1`**, is the specific curve used in ECDSA in Ethereum
+
+
+### Digital Signature Creation Process
+
+- Using ECDSA algorithm, hash the msg. and then combine hash with private keys called as `Signing a Message`
+- After Signing -> Digital signature is created
+- Each distinct msg. generates unique hash results in `unique signature`
+
+
+
+### Signatures components (r,s,v)
+
+- This components can be generated by splitting signatures that is generated during TNX.
+
+1. `r` -> 32-bytes -> A point on curve (secp256k1)
+2. `s` -> 32-bytes ->  value that proves the signer knows the private key without revealing it.
+3. `v` -> uint8(1-bytes) ->  helps determine the correct public key.
+
+
+
+#### Summary
+
+- **Ethereum uses Elliptic Curve Digital Signature Algorithm (ECDSA) to generate signatures.**
+- `ECDSA` is an cryptographic algorithm
+- used to generate key pairs, creating signatures and verifying signatures.
+- Use an elliptic curve `secp256k1`
+- Use signatures component for digital signatures `(r,s,v)`
+- (r,s,v) refferred from elliptic curve
