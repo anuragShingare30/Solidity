@@ -19,6 +19,7 @@
     - CCIP and CCT
 3. Alchemy contracts
 4. Soulmate and brownie-smart-contracts
+5. eth-infinitism(for account abstraction)
 
 **`wallets and Frameworks`**
 1. Metamask
@@ -34,6 +35,9 @@
 3. svg to base64
 4. Sepolia Opensea
 
+**`Solidity Hack Tools`**
+1. https://openchain.xyz/trace  ->  Transaction Tracker
+2. https://www.4byte.directory/  -> Ethereum Signature Database
 
 
 ### Core Concepts Covered!!!
@@ -3003,7 +3007,7 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
 8. **Test functions must have either **external or public** visibility.**
 
 
-9. **type aliases(enum, struct, array,errors,events) can be call using main contract(Lottery) only.**
+9. **type aliases(enum, struct, array,errors,events) can be call using main contract only.**
     ```solidity
     function test_GetRaffleState() public view {
         assert(lottery.getLotteryStatus() == Lottery.LotteryStatus.Open);
@@ -3178,8 +3182,20 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
     }
     ``` 
 
+27. **Fundamental rule to write the test function**:
+    - Arrange -> Act -> Assert
+    ```solidity
+    function test_FundamentalsToFollow() public {
+        <!-- ARRANGE -->
 
-26.  **During testing with foundry, keep some point for best practices:**
+        <!-- ACT -->
+
+        <!-- ASSERT -->
+    }
+    ```
+
+
+28.  **During testing with foundry, keep some point for best practices:**
     - Never make a variable public which contain imp. keys.
     - Write `getterFunctions` 
     - Only main contract can call `errors,events,structs,enums,types aliases`
@@ -4323,3 +4339,109 @@ export default Home;
 - Use an elliptic curve `secp256k1`
 - Use signatures component for digital signatures `(r,s,v)`
 - (r,s,v) refferred from elliptic curve
+
+
+
+
+
+
+
+
+## Account Abstraction(AA)
+
+- **Account Abstraction (AA) is a concept in Ethereum that` enhances user experience` by allowing smart contracts to act as user accounts(EOAs)**
+- This removes the traditional process of EOAs for initiating transactions!!!
+
+- **Account Abstraction** modifies the traditional Ethereum account model by `introducing smart contract wallets that can act like EOAs`
+- **AA** improves
+
+
+
+
+## What is ERC-4337/EIP-4337?
+
+
+**`ERC-4337` is a specification that aims to use an `entry point contract` to achieve account abstraction `without changing the consensus layer protocol` of Ethereum.**
+- Instead of modifying the logic of the consensus layer itself, ERC-4337 replicates the functionality of the transaction mempool in a higher-level system
+
+- ERC-4337 also introduces `paymaster mechanism` -> Other users can pay the gas fees for the transaction in ERC-20 tokens
+
+
+
+### There are several main components to ERC-4337 :-
+
+1. **`UserOperation`**:
+   - This are `transaction objects` that are used to execute transactions with contract accounts. 
+   - UserOp struct contains  ->> sender(baseAccount) address, nonce, bytes functionData, signature, paymaster calldata(first 20-bytes is paymaster address!!!)
+   - `sender` -> address of the smart contract account
+   - `functionData` -> Data that's passed to the sender for execution (function selector!!!)
+   - `paymaster calldata` -> Contains all info. for paymaster address and function (first 20-bytes is paymaster address!!!)
+
+
+2. **`UserOperation mempool(Bundlers)`**: 
+   - UserOperations will be sent to the UserOperation mempool
+   - Bundlers listen to the UserOperation mempool and `bundle multiple UserOperations` together into a "classic" transaction.
+
+
+
+3. **`Bundlers Service`**:
+   - These are **specialized nodes** that `collect UserOperations` from multiple users and `package them into a single Ethereum block for efficiency`
+   - A bundler is the core infrastructure component that allows `account abstraction to work on any EVM network `
+   - This work with a new mempool of UserOperations and get the transaction included on-chain.
+   - This package UserOperations from a mempool and `send them to the EntryPoint` contract on-chain
+
+
+
+4. **`Paymasters contracts`**:
+   - This are smart contract accounts that can `pays the gas fees for Account Contracts`
+   - Users can also pay in `ERC-20 tokens` instead of ETH
+   - `Paymasters` are included -> because the wallet owner needs to find a way to get some ETH before interaction with DApps on-chain
+   - With paymasters, ERC-4337 allows abstracting gas payments altogether, meaning `​​someone other than the wallet owner can pay for the gas instead.`
+   - This makes user experience better!!!
+
+
+
+
+5. **`Entry point contract`**:
+   - This contract `verifies and executes` the bundles of UserOperations sent to it from bundlers!!!
+   - The use of a single EntryPoint contract simplifies the logic used by smart contract wallets
+   - Bundlers will send many userOps to entrypoint contract
+   - This will `verify each userOps with contract accounts`
+   - After verification -> EntryPoint contract will asks contract account to execute the specific function
+
+
+
+6. **`Smart contract Account`**:
+   - An smart contract wallet of user
+   - This contract account should consist two functions -> `validateUserOps` and `executeUserOps`
+   - one to verify signatures, and another to process transactions.
+
+
+7. **`Aggregrator(optional)`**
+
+
+
+8. **`Important Points`**:
+   - **Note** -> `verifyUserOps() and execute()` will only be called by entryPoint Contract or baseAccount owner
+   - **Note** -> entryPoint will verifies userOps one-by-one and once verified it will execute the function one-by-one!!!
+   -  This will avoid the `storage collision and verification clashes of userOps` during verification!!!
+
+
+
+
+### Account Abstraction Flow!!!
+
+
+1. **AA user -> Bundlers**
+   - AA user will signed userOp (where sender will be contract account)
+   - `Bundlers` will collect many userOps
+   - Verifies the userOps ->  Sign them in a TNX ->  Send it off to the entryPoint contract
+
+2. **Bundlers will simulate each userOps**:
+   - Bundlers after collecting all userOps -> Send that to the entrypoint contract for `simulating and verifying` each userOps with contract account and paymasters
+   - `EntryPoint contract` will verifies each userOps on-chain with contract account
+  
+3. **Bundlers will submit TNX to entry point contract**:
+   - `Entrypoint` will checks for verified userOps with contract account
+   - Paymasters will verify the userOps
+   - After `verification` -> Contract account `executes the function and perform the state changes`!!!
