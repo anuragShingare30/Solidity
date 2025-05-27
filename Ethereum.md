@@ -3103,9 +3103,15 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
     } 
     ``` 
 
-17. **`transfer() and transferFrom()`**:
-    - `transfer()` we use this when we send transaction to ourself.
-    - `transferFrom()` we use this function when we want to send transaction to another account.
+17. **`transfer(to,amount)`**:
+    - This function is used to transfer tokens from the caller's address to another address
+
+
+17. **`transferFrom(from,to,amount)`**:
+    - This function is used to transfer tokens from one address to another on behalf of the owner
+    - The caller must have been approved (given allowance) by the owner to spend their tokens
+    - `from`-> owner's address
+    - `caller` -> should have allowance to spend tokens
 
   
 
@@ -3195,7 +3201,17 @@ forge test --fork-url <your_rpc_url> --etherscan-api-key <your_etherscan_api_key
     ```
 
 
-28.  **During testing with foundry, keep some point for best practices:**
+28. **Viem**:
+    - **Viem** is an TS interface used for ethereum development
+    - We can refer the `Viem Docs`
+    - **Viem**:
+        1. Can interact with contracts
+        2. **`WalletClients`** -> Interface to interact with ethereum accounts
+        3. **`PublicClients`** -> Interface used for public methods
+    
+    - **We can prefer `Viem` over web3.js and Ether.js for ethereum development**
+
+29.  **During testing with foundry, keep some point for best practices:**
     - Never make a variable public which contain imp. keys.
     - Write `getterFunctions` 
     - Only main contract can call `errors,events,structs,enums,types aliases`
@@ -3757,8 +3773,8 @@ const Home = () => {
   const [task,setTasks] = React.useState([]);
   const web3 = new Web3('https://sepolia.infura.io/v3/6e2aaaa2ff0c4e00995a96624cca8e7a');
 
-  // INITIALIZE THE SMART CONTRACT  
 
+  // INITIALIZE THE SMART CONTRACT  
   const token = new web3.eth.Contract(abi.abi, address.contractAddress);
 
   // CONNECT WALLET BTN FUNCTION
