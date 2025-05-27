@@ -1,4 +1,4 @@
-import { createWalletClient, custom, createPublicClient, formatEther, parseEther,defineChain} from 'https://esm.sh/viem'
+import { createWalletClient, custom, createPublicClient, formatEther, parseEther,defineChain,getContract} from 'https://esm.sh/viem'
 import { abi, contractAddress } from './constant.js';
 
 
@@ -7,6 +7,7 @@ let getBalanceBtn = document.getElementById('getBalanceBtn');
 let withdrawBtn = document.getElementById('withdrawBtn');
 let fundBtn = document.getElementById('fundBtn');
 let ethAmountValue = document.getElementById('ethAmount');
+let readFunctionBtn = document.getElementById('readBtn');
 
 let walletClient;
 let publicClient;
@@ -141,7 +142,35 @@ async function withdraw(){
 }
 
 
+// Reading function from contract
+async function readFunction() {
+    if(typeof window.ethereum !== 'undefined'){
+        try {
+             walletClient = createWalletClient({
+                transport: custom(window.ethereum)
+            });
+            publicClient = createPublicClient({
+                transport: custom(window.ethereum)
+            })
+            
+            const contract = getContract({
+                address: contractAddress,
+                abi:abi,
+                client: publicClient
+            })
+
+            const data = await contract.read.getVersion();
+            console.log(data);
+        } catch (error) {
+            console.error(error);
+        }
+    }else{
+        console.log("Install metamask");
+    }
+}
+
 connectBtn.onclick = connect;
 getBalanceBtn.onclick = getBalance;
 fundBtn.onclick = fund;
 withdrawBtn.onclick = withdraw;
+readFunctionBtn.onclick = readFunction;
